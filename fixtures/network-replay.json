@@ -1,0 +1,17 @@
+[
+  {"name": "port-scan", "stream": "zeek/notice.log", "expected_alerts": {"SOC-011": 1},
+   "record": {"note": "Scan::Port_Scan", "msg": "Synthetic scan of 25 ports (lab)"}},
+  {"name": "benign-notice", "stream": "zeek/notice.log", "expected_alerts": {},
+   "record": {"note": "SSL::Invalid_Server_Cert", "msg": "Synthetic certificate notice (lab)"}},
+  {"name": "dns-tunnel", "stream": "zeek/dns.log", "expected_alerts": {"SOC-012": 1},
+   "record": {"proto": "udp", "id.resp_p": 53,
+              "query": "aGVsbG8td29ybGQtdGhpcy1pcy1hLXR1bm5lbGVkLXBheWxvYWQtY2h1bmstMDAx.t.example.test"}},
+  {"name": "dns-normal", "stream": "zeek/dns.log", "expected_alerts": {},
+   "record": {"proto": "udp", "id.resp_p": 53, "query": "www.example.test"}},
+  {"name": "ids-high-severity", "stream": "suricata/eve.json", "expected_alerts": {"SOC-010": 1},
+   "record": {"event_type": "alert", "proto": "TCP", "dest_port": 443,
+              "alert": {"signature_id": 9000101, "signature": "Synthetic C2 beacon (lab)", "severity": 1}}},
+  {"name": "ids-low-severity", "stream": "suricata/eve.json", "expected_alerts": {},
+   "record": {"event_type": "alert", "proto": "TCP", "dest_port": 80,
+              "alert": {"signature_id": 9000102, "signature": "Synthetic policy notice (lab)", "severity": 3}}}
+]

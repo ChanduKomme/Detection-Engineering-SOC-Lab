@@ -1,0 +1,156 @@
+# Author: Chandu Komme — Detection Engineering SOC Lab
+data_dir = "${VECTOR_DATA_DIR:-/var/lib/vector}"
+
+[sources.windows_auth]
+type = "http_server"
+address = "${VECTOR_LISTEN_ADDRESS:-0.0.0.0:8688}"
+path = "/windows-auth"
+strict_path = true
+framing.method = "newline_delimited"
+decoding.codec = "json"
+
+[sources.zeek_logs]
+type = "file"
+include = [
+  "${SOC_TELEMETRY_DIR:-/var/log/soc}/zeek/conn.log",
+  "${SOC_TELEMETRY_DIR:-/var/log/soc}/zeek/dns.log",
+  "${SOC_TELEMETRY_DIR:-/var/log/soc}/zeek/notice.log",
+]
+read_from = "beginning"
+fingerprint.strategy = "device_and_inode"
+
+[sources.suricata_eve]
+type = "file"
+include = ["${SOC_TELEMETRY_DIR:-/var/log/soc}/suricata/eve.json"]
+read_from = "beginning"
+fingerprint.strategy = "device_and_inode"
+
+[transforms.normalize_windows]
+type = "remap"
+inputs = ["windows_auth"]
+drop_on_error = true
+drop_on_abort = true
+source = '''
+  record = .
+  code = to_string!(record.winlog.event_id)
+  if code != "4624" && code != "4625" { abort }
+
+  ip = string!(record.winlog.event_data.IpAddress)
+  if !ip_cidr_contains!(["0.0.0.0/0", "::/0"], ip) || ip == "0.0.0.0" || ip == "::" { abort }
+
+  outcome = if code == "4625" { "failure" } else { "success" }
+  . = {
+    "@timestamp": parse_timestamp!(record."@timestamp", format: "%+"),
+    "event": {
+      "dataset": "windows.security",
+      "category": "authentication",
+      "code": code,
+      "outcome": outcome
+    },
+    "host": {"name": string!(record.host.name)},
+    "source": {"ip": ip},
+    "user": {"name": string!(record.winlog.event_data.TargetUserName)}
+  }
+  if exists(record.event.id) {
+    .event.id = string!(record.event.id)
+    .document_id = .event.id
+  }
+  if exists(record.labels.replay_id) {
+    .labels = {
+      "replay_id": string!(record.labels.replay_id),
+      "scenario": string!(record.labels.scenario)
+    }
+  }
+'''
+
+[transforms.normalize_zeek]
+type = "remap"
+inputs = ["zeek_logs"]
+drop_on_error = true
+source = '''
+  path = parse_regex!(.file, r'/(?P<stream>conn|dns|notice)\.log$')
+  record = parse_json!(.message)
+  millis = to_int(round(to_float!(record.ts) * 1000))
+  . = {
+    "@timestamp": from_unix_timestamp!(millis, unit: "milliseconds"),
+    "event": {"dataset": "zeek." + path.stream, "category": "network"}
+  }
+  source_ip = string(record."id.orig_h") ?? string(record.src) ?? ""
+  dest_ip = string(record."id.resp_h") ?? string(record.dst) ?? ""
+  if source_ip != "" { .source = {"ip": source_ip} }
+  if dest_ip != "" { .destination = {"ip": dest_ip} }
+  if is_string(record.proto) { .network = {"transport": downcase!(record.proto)} }
+  if is_integer(record."id.resp_p") { .destination.port = record."id.resp_p" }
+  if is_integer(record.orig_bytes) { .source.bytes = record.orig_bytes }
+  if is_string(record.query) {
+    query = string!(record.query)
+    # Length feeds SOC-012, the long-DNS-name tunneling signal.
+    .dns = {"question": {"name": query, "length": strlen(query)}}
+  }
+  if is_string(record.note) { .rule = {"name": record.note} }
+  if is_string(record.uid) { .event.id = record.uid }
+  # Lab-only replay labels written by tools/replay.py --network.
+  if is_object(record.labels) {
+    .labels = {
+      "replay_id": string(record.labels.replay_id) ?? "",
+      "scenario": string(record.labels.scenario) ?? ""
+    }
+  }
+'''
+
+[transforms.normalize_suricata]
+type = "remap"
+inputs = ["suricata_eve"]
+drop_on_error = true
+source = '''
+  record = parse_json!(.message)
+  stamp = parse_timestamp(record.timestamp, format: "%+") ??
+          parse_timestamp!(record.timestamp, format: "%Y-%m-%dT%H:%M:%S%.f%z")
+  . = {
+    "@timestamp": stamp,
+    "event": {"dataset": "suricata.eve", "category": string!(record.event_type)}
+  }
+  if is_string(record.src_ip) { .source = {"ip": record.src_ip} }
+  if is_string(record.dest_ip) { .destination = {"ip": record.dest_ip} }
+  if is_string(record.proto) { .network = {"transport": downcase!(record.proto)} }
+  if exists(record.alert) {
+    .rule = {
+      "name": string!(record.alert.signature),
+      "id": to_string!(record.alert.signature_id),
+      "severity": to_int!(record.alert.severity)
+    }
+  }
+  if is_integer(record.dest_port) { .destination.port = record.dest_port }
+  if is_integer(record.flow_id) { .event.id = to_string!(record.flow_id) }
+  # Lab-only replay labels written by tools/replay.py --network.
+  if is_object(record.labels) {
+    .labels = {
+      "replay_id": string(record.labels.replay_id) ?? "",
+      "scenario": string(record.labels.scenario) ?? ""
+    }
+  }
+'''
+
+[transforms.stamp_ingest]
+type = "remap"
+inputs = ["normalize_windows", "normalize_zeek", "normalize_suricata"]
+source = '''
+  .pipeline = {"ingested_at": now(), "name": "detection-engineering-soc-lab"}
+'''
+
+[sinks.opensearch_main]
+type = "elasticsearch"
+inputs = ["stamp_ingest"]
+endpoints = ["${OPENSEARCH_URL:-https://opensearch:9200}"]
+# OpenSearch 2 uses typeless bulk actions.
+api_version = "v8"
+auth.strategy = "basic"
+auth.user = "admin"
+auth.password = "${OPENSEARCH_INITIAL_ADMIN_PASSWORD}"
+tls.verify_certificate = false
+tls.verify_hostname = false
+bulk.index = "soc-logs-telemetry"
+# Vector consumes this field as the bulk document ID and retains event.id.
+id_key = "document_id"
+batch.timeout_secs = 1
+acknowledgements.enabled = true

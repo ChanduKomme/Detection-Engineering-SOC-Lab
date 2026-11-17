@@ -1,0 +1,19 @@
+title: High-Severity Suricata Alert
+id: 9154e6af-7ded-4a51-9393-b5ff45197748
+status: test
+description: Surfaces Suricata EVE alerts with priority 1 or 2 for analyst triage.
+author: Chandu Komme
+date: 2026/11/17
+tags: [attack.command_and_control, attack.t1071.001]
+logsource:
+  product: suricata
+  category: alert
+detection:
+  selection:
+    event_type: alert
+    alert.severity|lte: 2
+  condition: selection
+level: high
+falsepositives:
+  - Signatures with broad matches that need tuning for the local network.
+  - Authorized penetration tests and red-team exercises.

@@ -1,0 +1,16 @@
+title: Unusually Long Zeek DNS Query
+id: 353b7b79-9f07-50fe-b947-584402036b14
+status: experimental
+description: Flags long DNS names for review as a possible tunneling signal
+author: Chandu Komme (based on upstream rule by Sandeep Mothukuri)
+tags: [attack.command_and_control, attack.t1071.004]
+logsource:
+  category: dns
+  product: zeek
+detection:
+  long_query:
+    query|re: '.{60,}'
+  condition: long_query
+level: medium
+falsepositives:
+  - Long names used by CDNs or telemetry services.

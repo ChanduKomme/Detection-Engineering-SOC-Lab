@@ -1,0 +1,20 @@
+title: Zeek LLMNR or NBT-NS Traffic
+id: 637def39-8987-53c7-9e66-b60fc2159954
+status: experimental
+description: Highlights legacy name resolution traffic for investigation
+author: Chandu Komme (based on upstream rule by Sandeep Mothukuri)
+tags: [attack.credential_access, attack.t1557.001]
+logsource:
+  category: network_connection
+  product: zeek
+detection:
+  selection_llmnr:
+    resp_p: 5355
+    proto: udp
+  selection_nbns:
+    resp_p: 137
+    proto: udp
+  condition: selection_llmnr or selection_nbns
+level: medium
+falsepositives:
+  - Routine legacy name resolution on the local network.

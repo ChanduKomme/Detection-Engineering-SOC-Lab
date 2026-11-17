@@ -1,0 +1,16 @@
+title: Windows Defender Disabled
+id: 3ddb6f5b-2864-5856-a0aa-e1be76fdf926
+status: experimental
+description: Matches the Defender Operational event for disabled real-time protection
+author: Chandu Komme (based on upstream rule by Sandeep Mothukuri)
+tags: [attack.defense_evasion, attack.t1562.001]
+logsource:
+  product: windows
+  service: windefend
+detection:
+  selection:
+    EventID: 5001
+  condition: selection
+level: high
+falsepositives:
+  - Approved endpoint maintenance or managed policy changes.

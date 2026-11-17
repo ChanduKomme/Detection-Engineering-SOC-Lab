@@ -1,0 +1,20 @@
+title: Lateral Movement via SMB
+id: 1b0d0a6c-1fba-5234-9d9b-4fbfa424c43c
+status: experimental
+description: Detects lateral movement via SMB file shares
+author: Chandu Komme (based on upstream rule by Sandeep Mothukuri)
+tags: [attack.lateral_movement, attack.t1021.002]
+logsource:
+  category: network_connection
+  product: windows
+detection:
+  selection:
+    EventID: 3
+    DestinationPort: 445
+    Initiated: 'true'
+  filter:
+    Image|endswith: ['\explorer.exe', '\svchost.exe', '\System']
+  condition: selection and not filter
+level: medium
+falsepositives:
+  - Administrative file shares and application traffic.

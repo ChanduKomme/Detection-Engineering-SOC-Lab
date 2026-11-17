@@ -1,0 +1,14 @@
+# Author: Chandu Komme — Detection Engineering SOC Lab
+# Sigma source: detection-rules/sigma/network/T1071.004_dns_tunneling.yml
+name: "SOC-012 | T1071.004 | Unusually long DNS query"
+type: any
+index: soc-logs-telemetry
+timestamp_field: "@timestamp"
+query_delay: {seconds: 20}
+realert: {minutes: 15}
+query_key: source.ip
+filter:
+  - term: {event.dataset: zeek.dns}
+  - range: {dns.question.length: {gte: 60}}
+include_match_in_root: true
+alert: [debug]

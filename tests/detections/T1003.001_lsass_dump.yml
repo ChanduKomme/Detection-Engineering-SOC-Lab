@@ -1,0 +1,15 @@
+# Author: Chandu Komme
+rule: detection-rules/sigma/credential-access/T1003.001_lsass_dump.yml
+cases:
+  - name: unknown tool opens LSASS with full access
+    expect: match
+    events:
+      - event: {TargetImage: 'C:\Windows\System32\lsass.exe', GrantedAccess: '0x1fffff', SourceImage: 'C:\Users\Public\procdump64.exe'}
+  - name: Defender scanning LSASS is filtered
+    expect: no_match
+    events:
+      - event: {TargetImage: 'C:\Windows\System32\lsass.exe', GrantedAccess: '0x1410', SourceImage: 'C:\ProgramData\Microsoft\Windows Defender\Platform\MsMpEng.exe'}
+  - name: low-privilege query access is not in the list
+    expect: no_match
+    events:
+      - event: {TargetImage: 'C:\Windows\System32\lsass.exe', GrantedAccess: '0x1000', SourceImage: 'C:\Tools\taskmgr.exe'}

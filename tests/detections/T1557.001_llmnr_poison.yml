@@ -1,0 +1,19 @@
+# Author: Chandu Komme
+rule: detection-rules/sigma/credential-access/T1557_llmnr_poison.yml
+cases:
+  - name: LLMNR response traffic
+    expect: match
+    events:
+      - event: {resp_p: 5355, proto: udp, id.orig_h: 192.0.2.50}
+  - name: NBNS response traffic
+    expect: match
+    events:
+      - event: {resp_p: 137, proto: udp}
+  - name: ordinary DNS
+    expect: no_match
+    events:
+      - event: {resp_p: 53, proto: udp}
+  - name: LLMNR port over TCP
+    expect: no_match
+    events:
+      - event: {resp_p: 5355, proto: tcp}

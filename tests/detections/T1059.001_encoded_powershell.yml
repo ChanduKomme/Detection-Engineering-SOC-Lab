@@ -1,0 +1,19 @@
+# Author: Chandu Komme
+rule: detection-rules/sigma/execution/T1059.001_encoded_powershell.yml
+cases:
+  - name: powershell with -EncodedCommand
+    expect: match
+    events:
+      - event: {Image: 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe', CommandLine: 'powershell.exe -NoP -EncodedCommand SQBFAFgA'}
+  - name: pwsh with short -enc flag
+    expect: match
+    events:
+      - event: {Image: 'C:\Program Files\PowerShell\7\pwsh.exe', CommandLine: 'pwsh -enc SQBFAFgA'}
+  - name: plain script execution
+    expect: no_match
+    events:
+      - event: {Image: 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe', CommandLine: 'powershell.exe -File C:\Scripts\backup.ps1'}
+  - name: encoded flag passed to a non-PowerShell binary
+    expect: no_match
+    events:
+      - event: {Image: 'C:\Tools\custom.exe', CommandLine: 'custom.exe -EncodedCommand abc'}

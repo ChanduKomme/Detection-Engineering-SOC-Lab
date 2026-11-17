@@ -1,0 +1,18 @@
+# Author: Chandu Komme — Detection Engineering SOC Lab
+# Sigma source: detection-rules/sigma/credential-access/T1110_brute_force.yml
+name: "SOC-002 | T1110.001 | Repeated Windows logon failures"
+type: frequency
+index: soc-logs-telemetry
+timestamp_field: "@timestamp"
+num_events: 10
+timeframe: {minutes: 5}
+query_delay: {seconds: 10}
+realert: {minutes: 15}
+query_key: source.ip
+filter:
+  - term: {event.dataset: windows.security}
+  - term: {event.code: "4625"}
+  - term: {event.outcome: failure}
+  - exists: {field: source.ip}
+include_match_in_root: true
+alert: [debug]

@@ -1,0 +1,18 @@
+title: Large Outbound Transfer in Zeek
+id: 931d7a6d-a49b-50dd-8670-e48f78786e09
+status: experimental
+description: Surfaces external connections with at least five million originator bytes
+author: Chandu Komme (based on upstream rule by Sandeep Mothukuri)
+tags: [attack.exfiltration, attack.t1041]
+logsource:
+  category: network_connection
+  product: zeek
+detection:
+  selection:
+    local_orig: true
+    local_resp: false
+    orig_bytes|gte: 5000000
+  condition: selection
+level: medium
+falsepositives:
+  - Backups and approved large file transfers.

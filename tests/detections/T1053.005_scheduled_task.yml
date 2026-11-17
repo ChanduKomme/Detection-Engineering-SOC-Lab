@@ -1,0 +1,15 @@
+# Author: Chandu Komme
+rule: detection-rules/sigma/persistence/T1053.005_scheduled_task.yml
+cases:
+  - name: scheduled task launching PowerShell
+    expect: match
+    events:
+      - event: {EventID: 4698, TaskName: '\Updater', TaskContent: '<Exec><Command>powershell.exe</Command><Arguments>-w hidden -c iex</Arguments></Exec>'}
+  - name: scheduled task running an approved binary
+    expect: no_match
+    events:
+      - event: {EventID: 4698, TaskName: '\Backup', TaskContent: '<Exec><Command>C:\Program Files\Backup\agent.exe</Command></Exec>'}
+  - name: task deleted rather than created
+    expect: no_match
+    events:
+      - event: {EventID: 4699, TaskContent: '<Exec><Command>powershell.exe</Command></Exec>'}

@@ -1,0 +1,15 @@
+# Author: Chandu Komme
+rule: detection-rules/sigma/lateral-movement/T1021.002_smb_lateral.yml
+cases:
+  - name: unusual process opens SMB connection
+    expect: match
+    events:
+      - event: {EventID: 3, DestinationPort: 445, Initiated: 'true', Image: 'C:\Users\Public\psexec.exe'}
+  - name: Explorer browsing a file share is filtered
+    expect: no_match
+    events:
+      - event: {EventID: 3, DestinationPort: 445, Initiated: 'true', Image: 'C:\Windows\explorer.exe'}
+  - name: inbound SMB connection
+    expect: no_match
+    events:
+      - event: {EventID: 3, DestinationPort: 445, Initiated: 'false', Image: 'C:\Users\Public\psexec.exe'}

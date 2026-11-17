@@ -1,0 +1,172 @@
+{
+  "name": "Detection Engineering SOC Lab - Chandu Komme",
+  "versions": {
+    "attack": "16",
+    "navigator": "5.1.0",
+    "layer": "4.5"
+  },
+  "domain": "enterprise-attack",
+  "description": "Detection coverage of the Detection Engineering SOC Lab by Chandu Komme. Score 1: tested Sigma rule. Score 2: live ElastAlert2 rule verified by replay.",
+  "techniques": [
+    {
+      "techniqueID": "T1003.001",
+      "score": 1,
+      "color": "#8ec8f0",
+      "comment": "Sigma: LSASS Memory Access \u2014 Credential Dumping",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1021.002",
+      "score": 1,
+      "color": "#8ec8f0",
+      "comment": "Sigma: Lateral Movement via SMB",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1027",
+      "score": 1,
+      "color": "#8ec8f0",
+      "comment": "Sigma: Suspicious Encoded PowerShell Execution",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1041",
+      "score": 1,
+      "color": "#8ec8f0",
+      "comment": "Sigma: Large Outbound Transfer in Zeek",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1046",
+      "score": 2,
+      "color": "#2f7fd1",
+      "comment": "Live: SOC-011; Sigma: Network Port Scan (Zeek detection)",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1047",
+      "score": 1,
+      "color": "#8ec8f0",
+      "comment": "Sigma: WMIC Remote Process Creation",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1053.005",
+      "score": 1,
+      "color": "#8ec8f0",
+      "comment": "Sigma: Script-Related Scheduled Task Creation",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1059.001",
+      "score": 1,
+      "color": "#8ec8f0",
+      "comment": "Sigma: Suspicious Encoded PowerShell Execution",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1071.001",
+      "score": 2,
+      "color": "#2f7fd1",
+      "comment": "Live: SOC-010; Sigma: High-Severity Suricata Alert",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1071.004",
+      "score": 2,
+      "color": "#2f7fd1",
+      "comment": "Live: SOC-012; Sigma: Unusually Long Zeek DNS Query",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1078",
+      "score": 1,
+      "color": "#8ec8f0",
+      "comment": "Sigma: Successful Logon After Brute Force from the Same Source",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1110.001",
+      "score": 2,
+      "color": "#2f7fd1",
+      "comment": "Live: SOC-002; Sigma: Repeated Windows Logon Failures from One Source, Successful Logon After Brute Force from the Same Source",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1110.003",
+      "score": 2,
+      "color": "#2f7fd1",
+      "comment": "Live: SOC-003; Sigma: Password Spray from One Source",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1547.001",
+      "score": 1,
+      "color": "#8ec8f0",
+      "comment": "Sigma: Persistence via Registry Run Keys",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1550.002",
+      "score": 1,
+      "color": "#8ec8f0",
+      "comment": "Sigma: Pass-the-Hash Attack",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1557.001",
+      "score": 1,
+      "color": "#8ec8f0",
+      "comment": "Sigma: Zeek LLMNR or NBT-NS Traffic",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1562.001",
+      "score": 1,
+      "color": "#8ec8f0",
+      "comment": "Sigma: Windows Defender Disabled",
+      "enabled": true,
+      "showSubtechniques": true
+    }
+  ],
+  "gradient": {
+    "colors": [
+      "#8ec8f0",
+      "#2f7fd1"
+    ],
+    "minValue": 1,
+    "maxValue": 2
+  },
+  "legendItems": [
+    {
+      "label": "Tested Sigma rule",
+      "color": "#8ec8f0"
+    },
+    {
+      "label": "Live rule verified by replay",
+      "color": "#2f7fd1"
+    }
+  ],
+  "metadata": [
+    {
+      "name": "author",
+      "value": "Chandu Komme"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+# Author: Chandu Komme
+rule: detection-rules/sigma/defense-evasion/T1562.001_defender_disable.yml
+cases:
+  - name: real-time protection disabled
+    expect: match
+    events:
+      - event: {EventID: 5001, Channel: Microsoft-Windows-Windows Defender/Operational}
+  - name: real-time protection enabled
+    expect: no_match
+    events:
+      - event: {EventID: 5000}

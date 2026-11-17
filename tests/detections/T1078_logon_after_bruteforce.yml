@@ -1,0 +1,39 @@
+# Author: Chandu Komme
+rule: detection-rules/sigma/initial-access/T1078_logon_after_bruteforce.yml
+cases:
+  - name: burst of failures then a success from the same source
+    expect: match
+    events:
+      - repeat: 12
+        every: 5s
+        event: {EventID: 4625, IpAddress: 203.0.113.9, TargetUserName: alice}
+      - start: 3m
+        event: {EventID: 4624, IpAddress: 203.0.113.9, TargetUserName: alice}
+  - name: success before the burst is out of order
+    expect: no_match
+    events:
+      - event: {EventID: 4624, IpAddress: 203.0.113.9, TargetUserName: alice}
+      - repeat: 12
+        every: 5s
+        event: {EventID: 4625, IpAddress: 203.0.113.9, TargetUserName: alice}
+  - name: success comes from a different source
+    expect: no_match
+    events:
+      - repeat: 12
+        every: 5s
+        event: {EventID: 4625, IpAddress: 203.0.113.9, TargetUserName: alice}
+      - event: {EventID: 4624, IpAddress: 203.0.113.10, TargetUserName: alice}
+  - name: too few failures before the success
+    expect: no_match
+    events:
+      - repeat: 5
+        event: {EventID: 4625, IpAddress: 203.0.113.9, TargetUserName: alice}
+      - event: {EventID: 4624, IpAddress: 203.0.113.9, TargetUserName: alice}
+  - name: success arrives after the ten-minute window
+    expect: no_match
+    events:
+      - repeat: 10
+        every: 5s
+        event: {EventID: 4625, IpAddress: 203.0.113.9, TargetUserName: alice}
+      - start: 20m
+        event: {EventID: 4624, IpAddress: 203.0.113.9, TargetUserName: alice}

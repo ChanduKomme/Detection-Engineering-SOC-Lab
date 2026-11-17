@@ -1,0 +1,32 @@
+title: Windows Failed Logon
+name: windows_failed_logon
+id: 8f651e96-7ebe-49b0-93ca-16a58f271099
+status: experimental
+description: Selects a failed Windows Security logon event for source-IP correlation.
+author: Chandu Komme
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID: 4625
+  condition: selection
+level: low
+---
+title: Repeated Windows Logon Failures from One Source
+id: 357279f3-a44c-4fad-a08d-06fe7cf8af29
+status: test
+description: Detects ten or more failed Windows logons from the same source IP within five minutes.
+author: Chandu Komme
+correlation:
+  type: event_count
+  rules: [windows_failed_logon]
+  group-by: [IpAddress]
+  timespan: 5m
+  condition:
+    gte: 10
+tags: [attack.credential_access, attack.t1110.001]
+falsepositives:
+  - An application or service retrying a stale password.
+  - Several clients sharing one NAT address.
+level: high

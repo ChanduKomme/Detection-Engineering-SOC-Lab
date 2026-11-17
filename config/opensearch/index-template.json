@@ -1,0 +1,130 @@
+{
+  "index_patterns": [
+    "soc-logs-*"
+  ],
+  "template": {
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0
+    },
+    "mappings": {
+      "dynamic": false,
+      "properties": {
+        "@timestamp": {
+          "type": "date"
+        },
+        "pipeline": {
+          "properties": {
+            "ingested_at": {
+              "type": "date"
+            },
+            "name": {
+              "type": "keyword"
+            }
+          }
+        },
+        "event": {
+          "properties": {
+            "category": {
+              "type": "keyword"
+            },
+            "dataset": {
+              "type": "keyword"
+            },
+            "code": {
+              "type": "keyword"
+            },
+            "id": {
+              "type": "keyword"
+            },
+            "outcome": {
+              "type": "keyword"
+            }
+          }
+        },
+        "source": {
+          "properties": {
+            "ip": {
+              "type": "ip"
+            },
+            "bytes": {
+              "type": "long"
+            }
+          }
+        },
+        "destination": {
+          "properties": {
+            "ip": {
+              "type": "ip"
+            },
+            "port": {
+              "type": "integer"
+            }
+          }
+        },
+        "host": {
+          "properties": {
+            "name": {
+              "type": "keyword"
+            }
+          }
+        },
+        "user": {
+          "properties": {
+            "name": {
+              "type": "keyword"
+            },
+            "domain": {
+              "type": "keyword"
+            }
+          }
+        },
+        "labels": {
+          "properties": {
+            "replay_id": {
+              "type": "keyword"
+            },
+            "scenario": {
+              "type": "keyword"
+            }
+          }
+        },
+        "dns": {
+          "properties": {
+            "question": {
+              "properties": {
+                "name": {
+                  "type": "keyword"
+                },
+                "length": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "network": {
+          "properties": {
+            "transport": {
+              "type": "keyword"
+            }
+          }
+        },
+        "rule": {
+          "properties": {
+            "id": {
+              "type": "keyword"
+            },
+            "name": {
+              "type": "keyword",
+              "ignore_above": 1024
+            },
+            "severity": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    }
+  }
+}

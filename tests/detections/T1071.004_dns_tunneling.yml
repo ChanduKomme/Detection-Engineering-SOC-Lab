@@ -1,0 +1,11 @@
+# Author: Chandu Komme
+rule: detection-rules/sigma/network/T1071.004_dns_tunneling.yml
+cases:
+  - name: long encoded subdomain
+    expect: match
+    events:
+      - event: {query: 'aGVsbG8td29ybGQtdGhpcy1pcy1hLXR1bm5lbGVkLXBheWxvYWQtY2h1bmstMDAx.t.example.test'}
+  - name: ordinary hostname
+    expect: no_match
+    events:
+      - event: {query: 'www.example.test'}

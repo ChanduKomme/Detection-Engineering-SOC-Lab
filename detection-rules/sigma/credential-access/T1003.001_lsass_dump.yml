@@ -1,0 +1,26 @@
+title: LSASS Memory Access — Credential Dumping
+id: 9c1736e4-f147-5c14-a370-6fddf6342975
+status: experimental
+description: Detects attempts to dump credentials from LSASS memory (Mimikatz, etc.)
+author: Chandu Komme (based on upstream rule by Sandeep Mothukuri)
+tags: [attack.credential_access, attack.t1003.001]
+logsource:
+  category: process_access
+  product: windows
+detection:
+  selection:
+    TargetImage|endswith: '\lsass.exe'
+    GrantedAccess:
+      - '0x1010'
+      - '0x1410'
+      - '0x147a'
+      - '0x1fffff'
+  filter:
+    SourceImage|endswith:
+      - '\MsMpEng.exe'
+      - '\csrss.exe'
+      - '\wininit.exe'
+  condition: selection and not filter
+level: critical
+falsepositives:
+  - Endpoint security and diagnostic software inspecting LSASS.

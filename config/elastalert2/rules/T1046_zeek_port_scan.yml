@@ -1,0 +1,14 @@
+# Author: Chandu Komme — Detection Engineering SOC Lab
+# Sigma source: detection-rules/sigma/discovery/T1046_network_scan.yml
+name: "SOC-011 | T1046 | Zeek port scan notice"
+type: any
+index: soc-logs-telemetry
+timestamp_field: "@timestamp"
+query_delay: {seconds: 20}
+realert: {minutes: 15}
+query_key: source.ip
+filter:
+  - term: {event.dataset: zeek.notice}
+  - term: {rule.name: "Scan::Port_Scan"}
+include_match_in_root: true
+alert: [debug]

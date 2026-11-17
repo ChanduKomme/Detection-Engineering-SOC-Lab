@@ -1,0 +1,1 @@
+{"timestamp":"2026-11-17T00:00:03.750000+0000","event_type":"alert","src_ip":"192.0.2.20","dest_ip":"198.51.100.30","proto":"TCP","alert":{"signature_id":9000001,"signature":"Synthetic IDS notice","severity":2}}

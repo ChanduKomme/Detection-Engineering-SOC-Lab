@@ -1,0 +1,11 @@
+# Author: Chandu Komme
+rule: detection-rules/sigma/discovery/T1046_network_scan.yml
+cases:
+  - name: Zeek port scan notice
+    expect: match
+    events:
+      - event: {note: 'Scan::Port_Scan', src: 192.0.2.20, dst: 198.51.100.30}
+  - name: unrelated Zeek notice
+    expect: no_match
+    events:
+      - event: {note: 'SSL::Invalid_Server_Cert', src: 192.0.2.20}

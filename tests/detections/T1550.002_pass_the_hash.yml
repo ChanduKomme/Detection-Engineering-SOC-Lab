@@ -1,0 +1,15 @@
+# Author: Chandu Komme
+rule: detection-rules/sigma/lateral-movement/T1550.002_pass_the_hash.yml
+cases:
+  - name: NTLM network logon with zero key length by a user
+    expect: match
+    events:
+      - event: {EventID: 4624, LogonType: 3, AuthenticationPackageName: NTLM, KeyLength: 0, SubjectUserName: alice}
+  - name: machine account is filtered
+    expect: no_match
+    events:
+      - event: {EventID: 4624, LogonType: 3, AuthenticationPackageName: NTLM, KeyLength: 0, SubjectUserName: 'WS01$'}
+  - name: Kerberos network logon
+    expect: no_match
+    events:
+      - event: {EventID: 4624, LogonType: 3, AuthenticationPackageName: Kerberos, KeyLength: 0, SubjectUserName: alice}

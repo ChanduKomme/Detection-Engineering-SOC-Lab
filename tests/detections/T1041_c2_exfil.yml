@@ -1,0 +1,15 @@
+# Author: Chandu Komme
+rule: detection-rules/sigma/exfiltration/T1041_c2_exfil.yml
+cases:
+  - name: large outbound transfer from an internal host
+    expect: match
+    events:
+      - event: {local_orig: true, local_resp: false, orig_bytes: 25000000}
+  - name: small outbound transfer
+    expect: no_match
+    events:
+      - event: {local_orig: true, local_resp: false, orig_bytes: 4096}
+  - name: large internal transfer
+    expect: no_match
+    events:
+      - event: {local_orig: true, local_resp: true, orig_bytes: 25000000}

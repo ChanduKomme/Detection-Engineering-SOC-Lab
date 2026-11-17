@@ -1,0 +1,34 @@
+# Author: Chandu Komme
+rule: detection-rules/sigma/credential-access/T1110_brute_force.yml
+cases:
+  - name: ten failures from one source within five minutes
+    expect: match
+    events:
+      - repeat: 10
+        every: 10s
+        event: {EventID: 4625, IpAddress: 192.0.2.10, TargetUserName: alice}
+  - name: nine failures stays below threshold
+    expect: no_match
+    events:
+      - repeat: 9
+        every: 10s
+        event: {EventID: 4625, IpAddress: 192.0.2.10, TargetUserName: alice}
+  - name: nine failures and one success
+    expect: no_match
+    events:
+      - repeat: 9
+        event: {EventID: 4625, IpAddress: 192.0.2.10, TargetUserName: alice}
+      - event: {EventID: 4624, IpAddress: 192.0.2.10, TargetUserName: alice}
+  - name: failures split across two sources
+    expect: no_match
+    events:
+      - repeat: 6
+        event: {EventID: 4625, IpAddress: 192.0.2.10, TargetUserName: alice}
+      - repeat: 4
+        event: {EventID: 4625, IpAddress: 192.0.2.11, TargetUserName: alice}
+  - name: ten failures spread over more than five minutes
+    expect: no_match
+    events:
+      - repeat: 10
+        every: 40s
+        event: {EventID: 4625, IpAddress: 192.0.2.10, TargetUserName: alice}

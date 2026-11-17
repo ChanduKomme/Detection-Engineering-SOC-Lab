@@ -1,0 +1,15 @@
+# Author: Chandu Komme
+rule: detection-rules/sigma/network/T1071.001_suricata_high_severity.yml
+cases:
+  - name: priority 1 alert
+    expect: match
+    events:
+      - event: {event_type: alert, src_ip: 192.0.2.30, alert: {signature: 'Synthetic C2 beacon (lab)', severity: 1}}
+  - name: priority 3 alert is informational
+    expect: no_match
+    events:
+      - event: {event_type: alert, alert: {signature: 'Synthetic policy notice', severity: 3}}
+  - name: flow record without an alert
+    expect: no_match
+    events:
+      - event: {event_type: flow, src_ip: 192.0.2.30}

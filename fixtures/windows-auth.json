@@ -1,0 +1,9 @@
+[
+  {"name": "at-threshold", "expected_alerts": {"SOC-002": 1}, "sources": [{"failures": 10}]},
+  {"name": "below-threshold", "expected_alerts": {}, "sources": [{"failures": 9}]},
+  {"name": "mixed-outcomes", "expected_alerts": {}, "sources": [{"failures": 9, "successes": 1}]},
+  {"name": "split-sources", "expected_alerts": {}, "sources": [{"failures": 6}, {"failures": 4}]},
+  {"name": "password-spray", "expected_alerts": {"SOC-003": 1}, "sources": [{"failures": 6, "users": 6}]},
+  {"name": "spray-below-threshold", "expected_alerts": {}, "sources": [{"failures": 4, "users": 4}]},
+  {"name": "spray-and-brute-force", "expected_alerts": {"SOC-002": 1, "SOC-003": 1}, "sources": [{"failures": 12, "users": 6}]}
+]

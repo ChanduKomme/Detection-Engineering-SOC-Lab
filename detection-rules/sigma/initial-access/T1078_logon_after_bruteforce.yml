@@ -1,0 +1,66 @@
+title: Windows Failed Logon for Breach Sequence
+name: breach_failed_logon
+id: 06489b2c-e05b-4165-b060-a9260205be77
+status: test
+description: Selects failed Windows Security logons.
+author: Chandu Komme
+date: 2026/11/17
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID: 4625
+  condition: selection
+level: low
+---
+title: Windows Successful Logon for Breach Sequence
+name: breach_successful_logon
+id: 017ebd4d-38c3-4641-b115-ccc4e173b609
+status: test
+description: Selects successful Windows Security logons.
+author: Chandu Komme
+date: 2026/11/17
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID: 4624
+  condition: selection
+level: informational
+---
+title: Failed Logon Burst for Breach Sequence
+name: breach_failed_logon_burst
+id: 175ed3ee-c8b7-4e1c-8008-47c42616ee1f
+status: test
+description: Ten or more failed logons from one source IP within five minutes.
+author: Chandu Komme
+date: 2026/11/17
+correlation:
+  type: event_count
+  rules: [breach_failed_logon]
+  group-by: [IpAddress]
+  timespan: 5m
+  condition:
+    gte: 10
+level: medium
+---
+title: Successful Logon After Brute Force from the Same Source
+id: a428987e-fb22-4b14-9ab2-7e021fbb2a44
+status: test
+description: >-
+  Chains a failed-logon burst with a later successful logon from the same IP
+  within ten minutes, the point where guessing likely became valid-account use.
+author: Chandu Komme
+date: 2026/11/17
+correlation:
+  type: temporal_ordered
+  rules: [breach_failed_logon_burst, breach_successful_logon]
+  group-by: [IpAddress]
+  timespan: 10m
+tags: [attack.initial_access, attack.t1078, attack.credential_access, attack.t1110.001]
+falsepositives:
+  - A user who forgot a recently changed password and then remembered it.
+  - A service retrying a stale credential before an administrator fixed it.
+level: critical
