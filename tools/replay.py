@@ -2,7 +2,7 @@
 """Replay synthetic Windows and network telemetry and verify every live rule.
 
 Author: Chandu Komme
-Project: Detection Engineering SOC Lab
+Project: CyberPulse SOC Lab
 
 The replay posts Windows Security events to Vector over HTTP and appends
 Zeek and Suricata records to the mounted telemetry directory. It then checks
@@ -124,6 +124,19 @@ def write_network_records(records, telemetry_dir=TELEMETRY_DIR):
         path.parent.mkdir(parents=True, exist_ok=True)
         with path.open("a", encoding="utf-8") as handle:
             handle.write(json.dumps(record, separators=(",", ":")) + "\n")
+
+
+def env_setting(name, default):
+    """Read a setting from the environment, then the lab's .env, then a default."""
+    if os.environ.get(name):
+        return os.environ[name]
+    env_file = ROOT / ".env"
+    if env_file.is_file():
+        for line in env_file.read_text(encoding="utf-8").splitlines():
+            key, _, value = line.partition("=")
+            if key.strip() == name and value.strip():
+                return value.strip()
+    return default
 
 
 def admin_password():
@@ -309,8 +322,10 @@ def build_report(replay_id, rules, expected, indexed, alerts, statuses):
 def main():
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--collector-port", type=int, default=8688)
-    parser.add_argument("--opensearch-port", type=int, default=9200)
+    parser.add_argument("--collector-port", type=int, default=int(env_setting("VECTOR_PORT", 8688)),
+                        help="Vector HTTP port (default: VECTOR_PORT from .env, else 8688).")
+    parser.add_argument("--opensearch-port", type=int, default=int(env_setting("OPENSEARCH_PORT", 9200)),
+                        help="OpenSearch port (default: OPENSEARCH_PORT from .env, else 9200).")
     parser.add_argument("--scope", choices=("all", "windows", "network"), default="all",
                         help="Which telemetry to replay (default: all).")
     parser.add_argument("--timeout", type=int, default=150, help="Seconds to wait for alert evidence.")
@@ -358,6 +373,11 @@ def main():
             args.report.parent.mkdir(parents=True, exist_ok=True)
             args.report.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
             print(f"Saved evidence to {args.report}")
+    except ssl.SSLError as error:
+        print(f"Replay failed. {error}\nPort {args.opensearch_port} did not answer with HTTPS, so it is "
+              "probably another service, not the lab's OpenSearch. Check `docker compose ps` for the "
+              "lab's OpenSearch port and pass it with --opensearch-port.", file=sys.stderr)
+        return 1
     except (HTTPException, OSError, RuntimeError, ValueError) as error:
         print(f"Replay failed. {error}", file=sys.stderr)
         return 1
