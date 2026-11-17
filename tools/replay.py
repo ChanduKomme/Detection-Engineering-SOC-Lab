@@ -88,33 +88,55 @@ def make_events(scenarios, replay_id, stamp, next_ip=None):
     return events
 
 
+def _expand(value, index):
+    """Fill {i} (1-based record number) and {port} (20000 + i) in template strings."""
+    if isinstance(value, str):
+        return value.replace("{i}", str(index)).replace("{port}", str(20000 + index))
+    if isinstance(value, dict):
+        return {key: _expand(item, index) for key, item in value.items()}
+    return value
+
+
 def make_network_records(scenarios, replay_id, stamp, next_ip=None):
-    """Build Zeek and Suricata JSON lines. Returns (stream, record, event_id) tuples."""
+    """Build Zeek and Suricata JSON lines. Returns (stream, record, event_id) tuples.
+
+    A scenario may set ``repeat`` to emit several records from one source and
+    ``int_fields`` to cast templated values (for example ports) back to integers.
+    Template values override the default destination, so one source can reach
+    many hosts or ports.
+    """
     next_ip = next_ip or address_factory(replay_id)
     base_flow = int(replay_id.hex[:12], 16) * 1000
     records = []
     for number, scenario in enumerate(scenarios, start=1):
         source_ip, dest_ip = next_ip(), f"198.51.100.{number}"
         labels = {"replay_id": str(replay_id), "scenario": scenario["name"]}
-        record = dict(scenario["record"])
         stream = scenario["stream"]
-        if stream.startswith("zeek/"):
-            event_id = f"{replay_id}-n{number:02}"
-            record.update({"ts": stamp.timestamp(), "uid": event_id, "labels": labels})
-            if stream.endswith("notice.log"):
-                record.update({"src": source_ip, "dst": dest_ip})
+        repeat = int(scenario.get("repeat", 1))
+        for index in range(1, repeat + 1):
+            record = _expand(dict(scenario["record"]), index)
+            for field in scenario.get("int_fields", []):
+                record[field] = int(record[field])
+            suffix = "" if repeat == 1 else f"-{index:02}"
+            if stream.startswith("zeek/"):
+                event_id = f"{replay_id}-n{number:02}{suffix}"
+                record.update({"ts": stamp.timestamp(), "uid": event_id, "labels": labels})
+                if stream.endswith("notice.log"):
+                    record.update({"src": source_ip, "dst": dest_ip})
+                else:
+                    record["id.orig_h"] = source_ip
+                    record.setdefault("id.resp_h", dest_ip)
+            elif stream == "suricata/eve.json":
+                flow_id = base_flow + number * 100 + index
+                event_id = str(flow_id)
+                record.update({
+                    "timestamp": stamp.strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
+                    "flow_id": flow_id, "src_ip": source_ip, "labels": labels,
+                })
+                record.setdefault("dest_ip", dest_ip)
             else:
-                record.update({"id.orig_h": source_ip, "id.resp_h": dest_ip})
-        elif stream == "suricata/eve.json":
-            flow_id = base_flow + number
-            event_id = str(flow_id)
-            record.update({
-                "timestamp": stamp.strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
-                "flow_id": flow_id, "src_ip": source_ip, "dest_ip": dest_ip, "labels": labels,
-            })
-        else:
-            raise RuntimeError(f"Unsupported network stream {stream!r}.")
-        records.append((stream, record, event_id))
+                raise RuntimeError(f"Unsupported network stream {stream!r}.")
+            records.append((stream, record, event_id))
     return records
 
 
@@ -299,7 +321,9 @@ def build_report(replay_id, rules, expected, indexed, alerts, statuses):
         if source_id not in case_map[scenario]["event_ids"]:
             raise RuntimeError(f"Alert {hit['_id']} cannot be linked to an indexed replay event.")
         case_map[scenario]["alerts"].append({"id": hit["_id"], "rule": soc_id,
-                                             "rule_name": alert["rule_name"], "event_id": source_id})
+                                             "rule_name": alert["rule_name"], "event_id": source_id,
+                                             "source_ip": alert.get("source", {}).get("ip"),
+                                             "alert_time": alert.get("alert_time")})
 
     observed = {name: {rule: sum(1 for a in case["alerts"] if a["rule"] == rule) for rule in rules}
                 for name, case in case_map.items()}

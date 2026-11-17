@@ -44,7 +44,8 @@ def normalize_windows(event):
 
 def normalize_network(stream, record, event_id):
     dataset = "suricata.eve" if stream.startswith("suricata/") else "zeek." + Path(stream).stem
-    doc = {"event": {"dataset": dataset, "id": event_id}, "labels": record["labels"]}
+    source = record.get("id.orig_h") or record.get("src") or record.get("src_ip")
+    doc = {"event": {"dataset": dataset, "id": event_id}, "labels": record["labels"], "source": {"ip": source}}
     if "query" in record:
         doc["dns"] = {"question": {"name": record["query"], "length": len(record["query"])}}
     return {"_id": f"auto-{event_id}", "_source": doc}
@@ -58,14 +59,15 @@ def alerts_for(expected, indexed, rules):
         for soc_id, count in row.items():
             for n in range(count):
                 alerts.append({"_id": f"{scenario}-{soc_id}-{n}", "_source": {
-                    "rule_name": rules[soc_id], "alert_sent": True,
-                    "labels": source["labels"], "event": {"id": source["event"]["id"]}}})
+                    "rule_name": rules[soc_id], "alert_sent": True, "alert_time": "2026-11-17T09:31:00Z",
+                    "labels": source["labels"], "event": {"id": source["event"]["id"]},
+                    "source": {"ip": source.get("source", {}).get("ip")}}})
     return alerts
 
 
 def test_load_rules_reads_every_live_rule():
     rules = replay.load_rules()
-    assert set(rules) == {"SOC-002", "SOC-003", "SOC-010", "SOC-011", "SOC-012"}
+    assert set(rules) == {"SOC-002", "SOC-003", "SOC-010", "SOC-011", "SOC-012", "SOC-013", "SOC-014", "SOC-015"}
     assert list(rules) == sorted(rules)
 
 
@@ -157,3 +159,21 @@ def test_case_report_cli(tmp_path, capsys):
     assert case_report.main([str(source), "-o", str(tmp_path / "case.md")]) == 0
     text = (tmp_path / "case.md").read_text()
     assert "[T1046](https://attack.mitre.org/techniques/T1046/)" in text and "`y`" in text
+
+
+def test_repeated_network_records_expand_templates():
+    *_, records = generate()
+    scan = [r for _, r, _ in records if r["labels"]["scenario"] == "port-scan-connections"]
+    assert len(scan) == 25 and len({r["id.resp_p"] for r in scan}) == 25
+    assert all(isinstance(r["id.resp_p"], int) and isinstance(r["id.orig_p"], int) for r in scan)
+    assert len({r["id.orig_h"] for r in scan}) == 1
+    poison = [r for _, r, _ in records if r["labels"]["scenario"] == "llmnr-poisoner"]
+    assert {r["id.resp_h"] for r in poison} == {"192.0.2.1", "192.0.2.2", "192.0.2.3"}
+    assert all(r["id.orig_p"] == 5355 for r in poison)
+    ids = [event_id for *_, event_id in records]
+    assert len(ids) == len(set(ids))
+
+
+def test_scenario_totals():
+    windows, network, events, records = generate()
+    assert (len(windows), len(network), len(events), len(records)) == (7, 12, 61, 53)
