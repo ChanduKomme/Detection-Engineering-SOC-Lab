@@ -4,7 +4,19 @@ cases:
   - name: real-time protection disabled
     expect: match
     events:
-      - event: {EventID: 5001, Channel: Microsoft-Windows-Windows Defender/Operational}
+      - event: {EventID: 5001}
+  - name: path exclusion added
+    expect: match
+    events:
+      - event: {EventID: 5007, NewValue: 'HKLM\SOFTWARE\Microsoft\Windows Defender\Exclusions\Paths\C:\Users\Public = 0x0'}
+  - name: real-time monitoring switched off through configuration
+    expect: match
+    events:
+      - event: {EventID: 5007, NewValue: 'HKLM\SOFTWARE\Microsoft\Windows Defender\Real-Time Protection\DisableRealtimeMonitoring = 0x1'}
+  - name: signature update configuration change
+    expect: no_match
+    events:
+      - event: {EventID: 5007, NewValue: 'HKLM\SOFTWARE\Microsoft\Windows Defender\Signature Updates\ScheduleDay = 0x0'}
   - name: real-time protection enabled
     expect: no_match
     events:
