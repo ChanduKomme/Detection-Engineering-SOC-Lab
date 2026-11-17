@@ -1,19 +1,27 @@
 # Author: Chandu Komme
 rule: detection-rules/sigma/execution/T1059.001_encoded_powershell.yml
 cases:
-  - name: powershell with -EncodedCommand
+  - name: full -EncodedCommand flag
     expect: match
     events:
-      - event: {Image: 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe', CommandLine: 'powershell.exe -NoP -EncodedCommand SQBFAFgA'}
-  - name: pwsh with short -enc flag
+      - event: {Image: 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe', CommandLine: 'powershell.exe -NoProfile -EncodedCommand SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoA'}
+  - name: shortest -e abbreviation
     expect: match
     events:
-      - event: {Image: 'C:\Program Files\PowerShell\7\pwsh.exe', CommandLine: 'pwsh -enc SQBFAFgA'}
-  - name: plain script execution
+      - event: {Image: 'C:\Program Files\PowerShell\7\pwsh.exe', CommandLine: 'pwsh -e SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoA'}
+  - name: renamed PowerShell identified by original file name
+    expect: match
+    events:
+      - event: {Image: 'C:\Users\Public\notepad.exe', OriginalFileName: 'PowerShell.EXE', CommandLine: 'notepad.exe -enc SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoA'}
+  - name: script file without encoding
     expect: no_match
     events:
-      - event: {Image: 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe', CommandLine: 'powershell.exe -File C:\Scripts\backup.ps1'}
-  - name: encoded flag passed to a non-PowerShell binary
+      - event: {Image: 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe', CommandLine: 'powershell.exe -ExecutionPolicy Bypass -File C:\Scripts\backup.ps1'}
+  - name: -ExecutionPolicy is not an encoded flag
     expect: no_match
     events:
-      - event: {Image: 'C:\Tools\custom.exe', CommandLine: 'custom.exe -EncodedCommand abc'}
+      - event: {Image: 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe', CommandLine: 'powershell.exe -ep bypass -c Get-Date'}
+  - name: encoded flag on a non-PowerShell program
+    expect: no_match
+    events:
+      - event: {Image: 'C:\Tools\custom.exe', OriginalFileName: 'custom.exe', CommandLine: 'custom.exe -enc SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoA'}

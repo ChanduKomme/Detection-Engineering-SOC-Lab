@@ -1,19 +1,37 @@
-title: WMIC Remote Process Creation
-id: 4522160c-2496-5e6e-832c-b31d82d32288
-status: experimental
-description: Detects WMI usage for remote execution — common APT lateral movement
-author: Chandu Komme (adapted from an MIT-licensed reference rule)
-tags: [attack.execution, attack.t1047, attack.lateral_movement]
+title: Process Spawned Through WMI or Created Remotely With WMIC
+id: ab0c24cb-31bf-4333-945c-b32445d9d831
+status: test
+description: >-
+  Catches both ends of WMI execution. On the target, WmiPrvSE.exe spawns a shell
+  or a living-off-the-land binary. On the source, wmic is run against a remote
+  node with "process call create".
+references:
+  - https://attack.mitre.org/techniques/T1047/
+author: Chandu Komme
+date: 2026/11/17
+tags: [attack.execution, attack.t1047]
 logsource:
-  category: process_creation
   product: windows
+  category: process_creation
 detection:
-  selection:
+  wmi_child:
+    ParentImage|endswith: '\WmiPrvSE.exe'
+    Image|endswith:
+      - '\cmd.exe'
+      - '\powershell.exe'
+      - '\pwsh.exe'
+      - '\mshta.exe'
+      - '\rundll32.exe'
+      - '\certutil.exe'
+  remote_wmic:
     Image|endswith: '\wmic.exe'
     CommandLine|contains|all:
       - '/node:'
-      - 'process call create'
-  condition: selection
-level: high
+      - 'process'
+      - 'call'
+      - 'create'
+  condition: wmi_child or remote_wmic
+fields: [ParentImage, Image, CommandLine, User]
 falsepositives:
-  - Approved remote administration tools and inventory jobs.
+  - Systems-management products that run inventory scripts through WMI.
+level: high

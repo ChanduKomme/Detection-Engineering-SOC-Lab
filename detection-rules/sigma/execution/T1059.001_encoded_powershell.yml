@@ -1,18 +1,31 @@
-title: Suspicious Encoded PowerShell Execution
-id: 890b93e4-c643-5108-94d4-e53a37e0b36a
-status: experimental
-description: Detects PowerShell with encoded/obfuscated commands — fileless malware, droppers
-author: Chandu Komme (adapted from an MIT-licensed reference rule)
-date: 2024/12/01
+title: PowerShell Launched With an Encoded Command Payload
+id: ae2d7f26-38ca-49ae-b90e-3cb1d54921e5
+status: test
+description: >-
+  Matches every abbreviation PowerShell accepts for -EncodedCommand, followed by a
+  base64 blob of at least 20 characters. It identifies PowerShell by image name
+  or by the original file name, so renamed copies are caught too.
+references:
+  - https://attack.mitre.org/techniques/T1059/001/
+author: Chandu Komme
+date: 2026/11/17
 tags: [attack.execution, attack.t1059.001, attack.defense_evasion, attack.t1027]
 logsource:
-  category: process_creation
   product: windows
+  category: process_creation
 detection:
-  selection:
-    Image|endswith: ['\powershell.exe', '\pwsh.exe']
-    CommandLine|contains: ['-EncodedCommand', '-enc ']
-  condition: selection
-level: high
+  powershell_image:
+    Image|endswith:
+      - '\powershell.exe'
+      - '\pwsh.exe'
+  powershell_original_name:
+    OriginalFileName:
+      - 'PowerShell.EXE'
+      - 'pwsh.dll'
+  encoded_argument:
+    CommandLine|re: '(?i)\s[-/]e(c|n|nc|nco|ncod|ncode|ncoded|ncodedc|ncodedco|ncodedcom|ncodedcomm|ncodedcomma|ncodedcomman|ncodedcommand)?\s+[A-Za-z0-9+/=]{20,}'
+  condition: (powershell_image or powershell_original_name) and encoded_argument
+fields: [CommandLine, ParentImage, User]
 falsepositives:
-  - Approved administration and software deployment scripts.
+  - Management agents (SCCM, Intune) that wrap scripts as encoded commands.
+level: high

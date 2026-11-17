@@ -1,15 +1,23 @@
 # Author: Chandu Komme
 rule: detection-rules/sigma/execution/T1047_wmi_execution.yml
 cases:
-  - name: remote process creation with WMIC
+  - name: WmiPrvSE spawns PowerShell on the target
     expect: match
     events:
-      - event: {Image: 'C:\Windows\System32\wbem\WMIC.exe', CommandLine: 'wmic /node:10.0.0.5 process call create "cmd.exe /c whoami"'}
-  - name: local WMIC query lacks the remote node flag
-    expect: no_match
+      - event: {ParentImage: 'C:\Windows\System32\wbem\WmiPrvSE.exe', Image: 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe', CommandLine: 'powershell -nop -w hidden'}
+  - name: wmic creates a process on a remote node
+    expect: match
     events:
-      - event: {Image: 'C:\Windows\System32\wbem\WMIC.exe', CommandLine: 'wmic process call create notepad.exe'}
-  - name: inventory query
+      - event: {Image: 'C:\Windows\System32\wbem\WMIC.exe', CommandLine: 'wmic /node:10.0.0.5 /user:admin process call create "cmd /c whoami"'}
+  - name: local wmic inventory query
     expect: no_match
     events:
       - event: {Image: 'C:\Windows\System32\wbem\WMIC.exe', CommandLine: 'wmic /node:10.0.0.5 os get caption'}
+  - name: WmiPrvSE spawning a non-shell helper
+    expect: no_match
+    events:
+      - event: {ParentImage: 'C:\Windows\System32\wbem\WmiPrvSE.exe', Image: 'C:\Windows\System32\WerFault.exe'}
+  - name: cmd started by Explorer
+    expect: no_match
+    events:
+      - event: {ParentImage: 'C:\Windows\explorer.exe', Image: 'C:\Windows\System32\cmd.exe'}
