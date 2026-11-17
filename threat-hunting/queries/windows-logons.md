@@ -33,4 +33,4 @@ In **Discover**, switch to `soc-logs-*` and filter by `labels.replay_id` and the
 See the [investigation worksheet](../../docs/investigation.md) to record the final disposition.
 
 ---
-*Detection Engineering SOC Lab — by [Chandu Komme](https://github.com/ChanduKomme)*
+*CyberPulse SOC Lab — by [Chandu Komme](https://github.com/ChanduKomme)*

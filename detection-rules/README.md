@@ -28,4 +28,4 @@ The [Sigma catalog](sigma/) contains portable rules for the original source sche
 Run `python -m detectlab lint` to check the catalog, and validate with pySigma before converting a rule to another backend. Review the false-positive notes beside each rule. For operation of the active detection, use the [replay walkthrough](../README.md#detection-validation-and-evidence).
 
 ---
-*Detection Engineering SOC Lab — by [Chandu Komme](https://github.com/ChanduKomme)*
+*CyberPulse SOC Lab — by [Chandu Komme](https://github.com/ChanduKomme)*

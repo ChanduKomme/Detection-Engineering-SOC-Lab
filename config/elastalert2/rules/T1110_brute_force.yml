@@ -1,4 +1,4 @@
-# Author: Chandu Komme — Detection Engineering SOC Lab
+# Author: Chandu Komme — CyberPulse SOC Lab
 # Sigma source: detection-rules/sigma/credential-access/T1110_brute_force.yml
 name: "SOC-002 | T1110.001 | Repeated Windows logon failures"
 type: frequency

@@ -61,5 +61,5 @@ One playbook per live rule. Each starts from the alert in `soc-alerts`, pivots i
 5. **Tune.** Allow-list confirmed vendor domains by parent domain with an owner and review date.
 
 ---
-*Detection Engineering SOC Lab — by [Chandu Komme](https://github.com/ChanduKomme)*
+*CyberPulse SOC Lab — by [Chandu Komme](https://github.com/ChanduKomme)*
 

@@ -1,4 +1,4 @@
-# Author: Chandu Komme — Detection Engineering SOC Lab
+# Author: Chandu Komme — CyberPulse SOC Lab
 data_dir = "${VECTOR_DATA_DIR:-/var/lib/vector}"
 
 [sources.windows_auth]
@@ -135,7 +135,7 @@ source = '''
 type = "remap"
 inputs = ["normalize_windows", "normalize_zeek", "normalize_suricata"]
 source = '''
-  .pipeline = {"ingested_at": now(), "name": "detection-engineering-soc-lab"}
+  .pipeline = {"ingested_at": now(), "name": "cyberpulse-soc-lab"}
 '''
 
 [sinks.opensearch_main]

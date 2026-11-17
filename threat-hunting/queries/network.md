@@ -54,5 +54,5 @@ GET soc-logs-telemetry/_search
 Suricata severity 1 is the highest priority. SOC-010 alerts on 1 and 2, and the `ids-low-severity` replay scenario checks that priority 3 stays quiet.
 
 ---
-*Detection Engineering SOC Lab — by [Chandu Komme](https://github.com/ChanduKomme)*
+*CyberPulse SOC Lab — by [Chandu Komme](https://github.com/ChanduKomme)*
 

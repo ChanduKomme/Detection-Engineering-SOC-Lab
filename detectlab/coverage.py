@@ -104,10 +104,10 @@ def collect(root: Path, sigma_dir: Path, tests_dir: Path, rules_dir: Path) -> li
 
 def navigator_layer(rows: list[dict]) -> dict:
     return {
-        "name": "Detection Engineering SOC Lab - Chandu Komme",
+        "name": "CyberPulse SOC Lab - Chandu Komme",
         "versions": {"attack": "16", "navigator": "5.1.0", "layer": "4.5"},
         "domain": "enterprise-attack",
-        "description": ("Detection coverage of the Detection Engineering SOC Lab by Chandu Komme. "
+        "description": ("Detection coverage of the CyberPulse SOC Lab by Chandu Komme. "
                         "Score 1: tested Sigma rule. Score 2: live ElastAlert2 rule verified by replay."),
         "techniques": [
             {
@@ -154,7 +154,7 @@ def markdown(rows: list[dict]) -> str:
             f"| {row['name']} | {tactics} | {', '.join(row['live']) or '—'} "
             f"| {'<br>'.join(row['sigma']) or '—'} | {row['tests']} |"
         )
-    lines += ["", "---", "*Detection Engineering SOC Lab — by [Chandu Komme](https://github.com/ChanduKomme)*", ""]
+    lines += ["", "---", "*CyberPulse SOC Lab — by [Chandu Komme](https://github.com/ChanduKomme)*", ""]
     return "\n".join(lines)
 
 

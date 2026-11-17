@@ -63,5 +63,5 @@ cases:
 4. Run `python -m detectlab coverage` and `make check`, then commit the regenerated files.
 
 ---
-*Detection Engineering SOC Lab — by [Chandu Komme](https://github.com/ChanduKomme)*
+*CyberPulse SOC Lab — by [Chandu Komme](https://github.com/ChanduKomme)*
 

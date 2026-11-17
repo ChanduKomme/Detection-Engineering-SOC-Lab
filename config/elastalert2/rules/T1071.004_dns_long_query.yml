@@ -1,4 +1,4 @@
-# Author: Chandu Komme — Detection Engineering SOC Lab
+# Author: Chandu Komme — CyberPulse SOC Lab
 # Sigma source: detection-rules/sigma/network/T1071.004_dns_tunneling.yml
 name: "SOC-012 | T1071.004 | Unusually long DNS query"
 type: any

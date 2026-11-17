@@ -22,4 +22,4 @@ Evidence ends here.
 Check all cited IDs in OpenSearch. Record unsupported statements as hypotheses and keep the investigation decision in the analyst worksheet.
 
 ---
-*Detection Engineering SOC Lab — by [Chandu Komme](https://github.com/ChanduKomme)*
+*CyberPulse SOC Lab — by [Chandu Komme](https://github.com/ChanduKomme)*

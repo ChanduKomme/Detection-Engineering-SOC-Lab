@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Author: Chandu Komme — Detection Engineering SOC Lab
+# Author: Chandu Komme — CyberPulse SOC Lab
 set -euo pipefail
 
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")"

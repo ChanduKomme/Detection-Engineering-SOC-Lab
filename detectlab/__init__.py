@@ -1,4 +1,4 @@
-"""Detection-as-code toolkit for the Detection Engineering SOC Lab.
+"""Detection-as-code toolkit for the CyberPulse SOC Lab.
 
 Author: Chandu Komme
 
@@ -8,4 +8,4 @@ detection be tested in CI without starting the Docker stack.
 """
 
 __author__ = "Chandu Komme"
-__version__ = "2.0.0"
+__version__ = "2.1.0"

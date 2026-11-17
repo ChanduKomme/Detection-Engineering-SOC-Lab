@@ -1,12 +1,12 @@
 {
-  "name": "Detection Engineering SOC Lab - Chandu Komme",
+  "name": "CyberPulse SOC Lab - Chandu Komme",
   "versions": {
     "attack": "16",
     "navigator": "5.1.0",
     "layer": "4.5"
   },
   "domain": "enterprise-attack",
-  "description": "Detection coverage of the Detection Engineering SOC Lab by Chandu Komme. Score 1: tested Sigma rule. Score 2: live ElastAlert2 rule verified by replay.",
+  "description": "Detection coverage of the CyberPulse SOC Lab by Chandu Komme. Score 1: tested Sigma rule. Score 2: live ElastAlert2 rule verified by replay.",
   "techniques": [
     {
       "techniqueID": "T1003.001",

@@ -1,4 +1,4 @@
-# Author: Chandu Komme — Detection Engineering SOC Lab
+# Author: Chandu Komme — CyberPulse SOC Lab
 # Common lab tasks. Run `make help` for the list.
 
 PYTHON ?= python3

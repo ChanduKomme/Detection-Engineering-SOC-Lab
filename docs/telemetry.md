@@ -66,4 +66,4 @@ Use the original Zeek timestamps and Suricata event times when investigating. Be
 | `ids-low-severity` | `suricata/eve.json` | none |
 
 ---
-*Detection Engineering SOC Lab — by [Chandu Komme](https://github.com/ChanduKomme)*
+*CyberPulse SOC Lab — by [Chandu Komme](https://github.com/ChanduKomme)*

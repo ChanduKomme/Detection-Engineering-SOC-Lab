@@ -29,4 +29,4 @@ SOC-002 observed ten Windows logon failures from one synthetic address, and SOC-
 | StackStorm | Model a case-creation or notification step using the reviewed alert fields. The bundled lab writes the alert and replay report locally. |
 
 ---
-*Detection Engineering SOC Lab — by [Chandu Komme](https://github.com/ChanduKomme)*
+*CyberPulse SOC Lab — by [Chandu Komme](https://github.com/ChanduKomme)*

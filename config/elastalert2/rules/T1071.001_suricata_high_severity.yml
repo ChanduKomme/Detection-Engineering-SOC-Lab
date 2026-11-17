@@ -1,4 +1,4 @@
-# Author: Chandu Komme — Detection Engineering SOC Lab
+# Author: Chandu Komme — CyberPulse SOC Lab
 # Sigma source: detection-rules/sigma/network/T1071.001_suricata_high_severity.yml
 name: "SOC-010 | T1071.001 | High-severity Suricata alert"
 type: any
