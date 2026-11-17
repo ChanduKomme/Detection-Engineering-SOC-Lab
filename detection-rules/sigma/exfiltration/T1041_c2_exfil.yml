@@ -2,7 +2,7 @@ title: Large Outbound Transfer in Zeek
 id: 931d7a6d-a49b-50dd-8670-e48f78786e09
 status: experimental
 description: Surfaces external connections with at least five million originator bytes
-author: Chandu Komme (based on upstream rule by Sandeep Mothukuri)
+author: Chandu Komme (adapted from an MIT-licensed reference rule)
 tags: [attack.exfiltration, attack.t1041]
 logsource:
   category: network_connection

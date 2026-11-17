@@ -2,7 +2,7 @@ title: Network Port Scan (Zeek detection)
 id: c4f86d2d-a9ef-5e6e-8b81-cc8a52ceb954
 status: experimental
 description: Matches a Zeek port-scan notice for analyst review
-author: Chandu Komme (based on upstream rule by Sandeep Mothukuri)
+author: Chandu Komme (adapted from an MIT-licensed reference rule)
 tags: [attack.discovery, attack.t1046]
 logsource:
   category: network_connection

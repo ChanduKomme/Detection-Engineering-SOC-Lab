@@ -2,7 +2,7 @@ title: Suspicious Encoded PowerShell Execution
 id: 890b93e4-c643-5108-94d4-e53a37e0b36a
 status: experimental
 description: Detects PowerShell with encoded/obfuscated commands — fileless malware, droppers
-author: Chandu Komme (based on upstream rule by Sandeep Mothukuri)
+author: Chandu Komme (adapted from an MIT-licensed reference rule)
 date: 2024/12/01
 tags: [attack.execution, attack.t1059.001, attack.defense_evasion, attack.t1027]
 logsource:

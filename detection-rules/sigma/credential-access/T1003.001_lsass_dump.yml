@@ -2,7 +2,7 @@ title: LSASS Memory Access — Credential Dumping
 id: 9c1736e4-f147-5c14-a370-6fddf6342975
 status: experimental
 description: Detects attempts to dump credentials from LSASS memory (Mimikatz, etc.)
-author: Chandu Komme (based on upstream rule by Sandeep Mothukuri)
+author: Chandu Komme (adapted from an MIT-licensed reference rule)
 tags: [attack.credential_access, attack.t1003.001]
 logsource:
   category: process_access

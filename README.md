@@ -44,7 +44,7 @@ A hands-on Security Operations Center lab with its own dark navy + cyan detectio
 - [Project structure](#project-structure)
 - [Lab boundaries](#lab-boundaries)
 - [Author](#author)
-- [Credits and license](#credits-and-license)
+- [License](#license)
 
 ## Project overview
 
@@ -278,6 +278,6 @@ Run the stack on a trusted local machine with synthetic or sanitized data. Host 
 
 - GitHub: [ChanduKomme](https://github.com/ChanduKomme)
 
-## Credits and license
+## License
 
-Copyright © 2026 Chandu Komme. Version 1 of this lab started from the [Enterprise Detection Engineering SOC Lab](https://github.com/sandeepmothukuri/Enterprise-Detection-Engineering-SOC-Lab/tree/ec8e4f8ba318b81786a79dcf98fc064f55b4a306) by Sandeep Mothukuri, whose copyright and MIT terms are kept in [LICENSE](LICENSE) as the license requires. Released under the [MIT License](LICENSE).
+Copyright © 2026 Chandu Komme. Released under the [MIT License](LICENSE).

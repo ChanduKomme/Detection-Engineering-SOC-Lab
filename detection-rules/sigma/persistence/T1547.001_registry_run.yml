@@ -2,7 +2,7 @@ title: Persistence via Registry Run Keys
 id: 92e6c179-3652-523a-a67c-ebab32fcacc1
 status: experimental
 description: Detects malware writing to registry Run/RunOnce keys for persistence
-author: Chandu Komme (based on upstream rule by Sandeep Mothukuri)
+author: Chandu Komme (adapted from an MIT-licensed reference rule)
 tags: [attack.persistence, attack.t1547.001]
 logsource:
   category: registry_set

@@ -2,7 +2,7 @@ title: Script-Related Scheduled Task Creation
 id: 087806d6-97c0-509b-93b2-019965851dbc
 status: experimental
 description: Detects creation of suspicious scheduled tasks for persistence
-author: Chandu Komme (based on upstream rule by Sandeep Mothukuri)
+author: Chandu Komme (adapted from an MIT-licensed reference rule)
 tags: [attack.persistence, attack.t1053.005]
 logsource:
   product: windows

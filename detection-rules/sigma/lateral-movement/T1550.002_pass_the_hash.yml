@@ -2,7 +2,7 @@ title: Pass-the-Hash Attack
 id: 1b98641c-89ae-5ac3-9e61-365309c2bb0b
 status: experimental
 description: Detects pass-the-hash attacks using harvested NTLM hashes
-author: Chandu Komme (based on upstream rule by Sandeep Mothukuri)
+author: Chandu Komme (adapted from an MIT-licensed reference rule)
 tags: [attack.lateral_movement, attack.t1550.002]
 logsource:
   product: windows
