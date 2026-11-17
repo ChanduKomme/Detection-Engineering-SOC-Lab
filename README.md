@@ -3,8 +3,8 @@
 [![SOC Lab validation](https://github.com/ChanduKomme/Detection-Engineering-SOC-Lab/actions/workflows/soc-lab-ci.yml/badge.svg)](https://github.com/ChanduKomme/Detection-Engineering-SOC-Lab/actions/workflows/soc-lab-ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![MITRE ATT&CK](https://img.shields.io/badge/MITRE-ATT%26CK-red)](docs/attack-coverage.md)
-![Version](https://img.shields.io/badge/version-2.1.0-00E5FF)
-![Detection tests](https://img.shields.io/badge/detection%20tests-52%20passing-brightgreen)
+![Version](https://img.shields.io/badge/version-2.2.0-00E5FF)
+![Detection tests](https://img.shields.io/badge/detection%20tests-87%20passing-brightgreen)
 
 **Built and maintained by [Chandu Komme](https://github.com/ChanduKomme).**
 
@@ -12,7 +12,7 @@ A hands-on Security Operations Center lab with its own dark navy + cyan detectio
 
 - **Author** — [Chandu Komme](https://github.com/ChanduKomme)
 - **Core stack** — Vector · OpenSearch · OpenSearch Dashboards · ElastAlert2
-- **Detection as code** — offline Sigma evaluator, rule linter, 52 detection unit tests, ATT&CK Navigator layer
+- **Detection as code** — offline Sigma evaluator, rule linter, 87 detection unit tests, ATT&CK Navigator layer
 - **Telemetry** — Windows Security authentication, Zeek conn/DNS/notice, Suricata EVE
 - **Console** — CyberPulse-branded OpenSearch Dashboards: dark theme, custom logo and login page, auto-imported SOC dashboard
 - **Deployment** — Docker Compose on a local lab machine, two-stage GitHub Actions pipeline
@@ -22,10 +22,10 @@ A hands-on Security Operations Center lab with its own dark navy + cyan detectio
 | | |
 |---|---|
 | Live rules verified by replay | **5** (SOC-002, SOC-003, SOC-010, SOC-011, SOC-012) |
-| Sigma rules with unit tests | **16 files**, 52 positive and negative cases |
+| Sigma rules with unit tests | **16 files**, 87 positive and negative cases |
 | ATT&CK techniques covered | **17** across 11 tactics — see [coverage](docs/attack-coverage.md) |
 | Replay scenarios | **13** (7 Windows, 6 network), each with an expected alert per rule |
-| Python test suite | **107 tests** for the evaluator, catalog, replay harness, case reports, and dashboard |
+| Python test suite | **142 tests** for the evaluator, catalog, replay harness, case reports, and dashboard |
 | Detection console | **11 panels**: KPIs, alerts by rule, telemetry by scenario, failed logons by account, alert queue |
 
 ## Contents
@@ -61,7 +61,7 @@ The lab follows the analyst workflow from a raw event to a supported investigati
 
 | Area | Implemented by Chandu Komme |
 |---|---|
-| Detection as code | Offline Sigma evaluator with correlations, rule linter, 52 unit tests, generated ATT&CK coverage and Navigator layer |
+| Detection as code | Offline Sigma evaluator with correlations, rule linter, 87 unit tests, generated ATT&CK coverage and Navigator layer |
 | New detections | Password spray (live and Sigma), high-severity IDS alert, Zeek port scan and long-DNS live rules, chained brute-force-then-success Sigma correlation |
 | Collection | DNS name length, destination port, originator bytes, and record IDs normalized from Zeek and Suricata |
 | Validation | Multi-rule alert matrix over 13 Windows and network scenarios, with unexpected alerts treated as failures |
@@ -139,7 +139,7 @@ The generated [ATT&CK coverage table](docs/attack-coverage.md) lists the rules a
 
 ```bash
 pip install -r requirements-dev.txt
-make check          # lint + 52 detection tests + coverage check + 107 pytest tests
+make check          # lint + 87 detection tests + coverage check + 142 pytest tests
 ```
 
 [`detectlab/`](detectlab/) evaluates the Sigma catalog offline: field modifiers, boolean conditions, and `event_count`, `value_count`, `temporal`, and `temporal_ordered` correlations, including a correlation built on another correlation. Each rule file has unit tests in [`tests/detections/`](tests/detections/) with at least one true positive and one near miss — below threshold, outside the window, out of order, from a different source, or excluded by a filter. The linter fails the build if a rule lacks a UUID, ATT&CK tag, false-positive guidance, or tests, or if a live rule breaks the `SOC-NNN | Txxxx | description` convention.
@@ -274,7 +274,7 @@ Run the stack on a trusted local machine with synthetic or sanitized data. Host 
 
 ## Author
 
-**Chandu Komme** — designed, built, and validated this lab: the CyberPulse detection console and theme, the Compose deployment, Vector normalization pipeline, five live ElastAlert2 detections, the `detectlab` detection-as-code toolkit with its Sigma evaluator, linter, and ATT&CK coverage generator, the 52 detection unit tests and pytest suite, the Windows and network replay harness and CI pipeline, the incident case-file generator, the triage playbooks and hunting queries, the investigation worksheet, and the AI triage exercise.
+**Chandu Komme** — designed, built, and validated this lab: the CyberPulse detection console and theme, the Compose deployment, Vector normalization pipeline, five live ElastAlert2 detections, the `detectlab` detection-as-code toolkit with its Sigma evaluator, linter, and ATT&CK coverage generator, the 87 detection unit tests and pytest suite, the Windows and network replay harness and CI pipeline, the incident case-file generator, the triage playbooks and hunting queries, the investigation worksheet, and the AI triage exercise.
 
 - GitHub: [ChanduKomme](https://github.com/ChanduKomme)
 

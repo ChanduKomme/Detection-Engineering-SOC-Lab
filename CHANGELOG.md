@@ -2,6 +2,25 @@
 
 All notable changes to the CyberPulse SOC Lab by Chandu Komme.
 
+## 2.2.0 — 2026-11-17
+
+### Changed
+- **Rewrote all 12 reference Sigma rules from scratch** with stronger logic:
+  - LSASS access now checks memory-read masks or minidump call stacks, and excludes trusted processes.
+  - Pass-the-hash covers both the type 9 seclogo shape and the type 3 zero-key-length NTLM shape.
+  - Registry persistence also covers RunOnceEx, policy Run and Winlogon, and requires a user-path or script-host payload.
+  - SMB lateral movement now detects executables written to admin shares (event 5145).
+  - Scheduled tasks are flagged for LOLBin actions, user paths and hidden tasks.
+  - LLMNR/NBT-NS poisoning is a value_count correlation of one responder answering many clients.
+  - Port scanning adds a raw-connection value_count fallback alongside the Zeek notice rule.
+  - Exfiltration requires an upload-heavy, sustained session.
+  - Encoded PowerShell matches every flag abbreviation and catches renamed binaries.
+  - WMI covers both WmiPrvSE children and remote wmic.
+  - DNS tunneling adds long-label and TXT/NULL checks.
+  - Defender tampering adds exclusion and configuration-change events.
+- Detection unit tests grew from 52 to 87 cases, and the pytest suite from 107 to 142 tests.
+- The license now lists Chandu Komme as the sole copyright holder.
+
 ## 2.1.0 — 2026-11-17
 
 ### Changed
