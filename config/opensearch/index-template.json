@@ -49,6 +49,9 @@
             },
             "bytes": {
               "type": "long"
+            },
+            "port": {
+              "type": "integer"
             }
           }
         },
@@ -59,6 +62,9 @@
             },
             "port": {
               "type": "integer"
+            },
+            "bytes": {
+              "type": "long"
             }
           }
         },
@@ -107,6 +113,9 @@
           "properties": {
             "transport": {
               "type": "keyword"
+            },
+            "direction": {
+              "type": "keyword"
             }
           }
         },
@@ -121,6 +130,16 @@
             },
             "severity": {
               "type": "integer"
+            }
+          }
+        },
+        "zeek": {
+          "properties": {
+            "conn_state": {
+              "type": "keyword"
+            },
+            "duration": {
+              "type": "float"
             }
           }
         }

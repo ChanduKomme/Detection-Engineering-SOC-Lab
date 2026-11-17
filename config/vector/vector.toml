@@ -80,8 +80,26 @@ source = '''
   if source_ip != "" { .source = {"ip": source_ip} }
   if dest_ip != "" { .destination = {"ip": dest_ip} }
   if is_string(record.proto) { .network = {"transport": downcase!(record.proto)} }
+  if is_integer(record."id.orig_p") { .source.port = record."id.orig_p" }
   if is_integer(record."id.resp_p") { .destination.port = record."id.resp_p" }
   if is_integer(record.orig_bytes) { .source.bytes = record.orig_bytes }
+  if is_integer(record.resp_bytes) { .destination.bytes = record.resp_bytes }
+  # Connection state and duration feed SOC-013 (scan) and SOC-015 (exfiltration).
+  if is_string(record.conn_state) { .zeek.conn_state = record.conn_state }
+  if is_float(record.duration) || is_integer(record.duration) {
+    .zeek.duration = to_float!(record.duration)
+  }
+  if is_boolean(record.local_orig) && is_boolean(record.local_resp) {
+    if record.local_orig == true && record.local_resp == false {
+      .network.direction = "outbound"
+    } else if record.local_orig == false && record.local_resp == true {
+      .network.direction = "inbound"
+    } else if record.local_orig == true {
+      .network.direction = "internal"
+    } else {
+      .network.direction = "external"
+    }
+  }
   if is_string(record.query) {
     query = string!(record.query)
     # Length feeds SOC-012, the long-DNS-name tunneling signal.
