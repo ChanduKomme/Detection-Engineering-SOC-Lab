@@ -1,11 +1,24 @@
-# Detection Engineering SOC Lab
+<p align="center"><img src="docs/assets/cyberpulse-banner.png" alt="CyberPulse SOC Lab" width="560"></p>
 
-A hands-on Security Operations Center lab that treats detections as code. Rules are linted, unit-tested against positive and near-miss events, mapped to MITRE ATT&CK, and then proven end to end on a live SIEM pipeline that replays Windows, Zeek, and Suricata telemetry and checks every alert.
+# CyberPulse SOC Lab
+
+[![SOC Lab validation](https://github.com/ChanduKomme/Detection-Engineering-SOC-Lab/actions/workflows/soc-lab-ci.yml/badge.svg)](https://github.com/ChanduKomme/Detection-Engineering-SOC-Lab/actions/workflows/soc-lab-ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![MITRE ATT&CK](https://img.shields.io/badge/MITRE-ATT%26CK-red)](docs/attack-coverage.md)
+![Version](https://img.shields.io/badge/version-2.1.0-00E5FF)
+![Detection tests](https://img.shields.io/badge/detection%20tests-52%20passing-brightgreen)
+
+**Built and maintained by [Chandu Komme](https://github.com/ChanduKomme).**
+
+![CyberPulse detection console](evidence/screenshots/02-detection-console-overview.jpg)
+
+A hands-on Security Operations Center lab with its own dark navy + cyan detection console. It treats detections as code. Rules are linted, unit-tested against positive and near-miss events, mapped to MITRE ATT&CK, and then proven end to end on a live SIEM pipeline that replays Windows, Zeek, and Suricata telemetry and checks every alert.
 
 - **Author** — [Chandu Komme](https://github.com/ChanduKomme)
 - **Core stack** — Vector · OpenSearch · OpenSearch Dashboards · ElastAlert2
 - **Detection as code** — offline Sigma evaluator, rule linter, 52 detection unit tests, ATT&CK Navigator layer
 - **Telemetry** — Windows Security authentication, Zeek conn/DNS/notice, Suricata EVE
+- **Console** — CyberPulse-branded OpenSearch Dashboards: dark theme, custom logo and login page, auto-imported SOC dashboard
 - **Deployment** — Docker Compose on a local lab machine, two-stage GitHub Actions pipeline
 
 ## At a glance
@@ -16,7 +29,8 @@ A hands-on Security Operations Center lab that treats detections as code. Rules 
 | Sigma rules with unit tests | **16 files**, 52 positive and negative cases |
 | ATT&CK techniques covered | **17** across 11 tactics — see [coverage](docs/attack-coverage.md) |
 | Replay scenarios | **13** (7 Windows, 6 network), each with an expected alert per rule |
-| Python test suite | **99 tests** for the evaluator, catalog, replay harness, and case reports |
+| Python test suite | **107 tests** for the evaluator, catalog, replay harness, case reports, and dashboard |
+| Detection console | **11 panels**: KPIs, alerts by rule, telemetry by scenario, failed logons by account, alert queue |
 
 ## Contents
 
@@ -24,11 +38,13 @@ A hands-on Security Operations Center lab that treats detections as code. Rules 
 - [Architecture and tooling](#architecture-and-tooling)
 - [Detection engineering](#detection-engineering)
 - [Detection as code](#detection-as-code)
+- [CyberPulse detection console](#cyberpulse-detection-console)
 - [Threat hunting and incident response](#threat-hunting-and-incident-response)
 - [AI-assisted SOC](#ai-assisted-soc)
 - [Requirements and installation](#requirements-and-installation)
 - [Configuration and service endpoints](#configuration-and-service-endpoints)
 - [Detection validation and evidence](#detection-validation-and-evidence)
+- [Local run evidence](#local-run-evidence)
 - [Project structure](#project-structure)
 - [Lab boundaries](#lab-boundaries)
 - [Author](#author)
@@ -127,12 +143,34 @@ The generated [ATT&CK coverage table](docs/attack-coverage.md) lists the rules a
 
 ```bash
 pip install -r requirements-dev.txt
-make check          # lint + 52 detection tests + coverage check + 99 pytest tests
+make check          # lint + 52 detection tests + coverage check + 107 pytest tests
 ```
 
 [`detectlab/`](detectlab/) evaluates the Sigma catalog offline: field modifiers, boolean conditions, and `event_count`, `value_count`, `temporal`, and `temporal_ordered` correlations, including a correlation built on another correlation. Each rule file has unit tests in [`tests/detections/`](tests/detections/) with at least one true positive and one near miss — below threshold, outside the window, out of order, from a different source, or excluded by a filter. The linter fails the build if a rule lacks a UUID, ATT&CK tag, false-positive guidance, or tests, or if a live rule breaks the `SOC-NNN | Txxxx | description` convention.
 
 Full guide: [detection as code](docs/detection-as-code.md).
+
+## CyberPulse detection console
+
+OpenSearch Dashboards is rebranded as the CyberPulse console. `setup.sh` mounts the theme and imports the dashboard, so the first page after sign-in is the SOC view.
+
+| Element | What changes |
+|---|---|
+| Theme | Dark mode locked on, with a navy background and cyan accents |
+| Branding | CyberPulse shield-and-pulse logo, header mark, favicon, loading animation, and browser title |
+| Login page | CyberPulse title, subtitle, and brand mark |
+| Landing page | Opens straight on **CyberPulse SOC Lab — Detection Console** |
+| Chart colors | Fixed per data source and per rule, so a color always means the same thing |
+
+| Color | Hex | Data source | Rule |
+|---|---|---|---|
+| Cyan | `#00E5FF` | Windows Security | SOC-002 brute force |
+| Violet | `#8B5CF6` | Zeek DNS | SOC-003 password spray |
+| Red | `#FF4D6D` | Suricata, failed logons | SOC-010 IDS high severity |
+| Amber | `#FFB020` | Zeek notices | SOC-011 port scan |
+| Teal | `#14B8A6` | Zeek connections | SOC-012 DNS tunneling |
+
+The dashboard has KPI tiles (telemetry events, alerts, unique sources, rules fired), an alerts-by-rule donut, telemetry by scenario and data source, an alerts-by-rule-and-scenario table, failed logons by account, the alert queue, and the telemetry stream. It is generated from code by [`tools/build_dashboard.py`](tools/build_dashboard.py) into [`dashboards/cyberpulse-soc-dashboard.ndjson`](dashboards/cyberpulse-soc-dashboard.ndjson), and a test keeps the two in sync. The theme lives in [`config/dashboards/`](config/dashboards/).
 
 ## Threat hunting and incident response
 
@@ -166,13 +204,13 @@ python3 tools/replay.py --report reports/replay.json
 python3 tools/case_report.py reports/replay.json -o reports/case.md
 ```
 
-The first start writes a generated OpenSearch admin password to a local `.env`, waits for the cluster, and installs the field mappings. Leave that file in place while using the same OpenSearch data volume. Run `make help` for every shortcut, `./health-check.sh` for service and cluster status, and `docker compose down` to stop the lab while keeping the data.
+The first start writes a generated OpenSearch admin password to a local `.env`, waits for the cluster, installs the field mappings, and imports the CyberPulse detection console. Open http://127.0.0.1:5601 and sign in as `admin`. Leave that file in place while using the same OpenSearch data volume. Run `make help` for every shortcut, `./health-check.sh` for service and cluster status, and `docker compose down` to stop the lab while keeping the data.
 
 ## Configuration and service endpoints
 
 | Service | Default local endpoint | Use |
 |---|---|---|
-| OpenSearch Dashboards | http://127.0.0.1:5601 | Sign in as `admin` with the password in `.env` |
+| CyberPulse console (OpenSearch Dashboards) | http://127.0.0.1:5601 | Sign in as `admin` with the password in `.env` |
 | OpenSearch | https://127.0.0.1:9200 | OpenSearch API with the lab certificate |
 | Vector | http://127.0.0.1:8688/windows-auth | HTTP POST endpoint for newline-delimited Windows event JSON |
 | ElastAlert2 | `docker compose logs elastalert2` | Rule evaluation logs and local alert writeback |
@@ -200,6 +238,25 @@ The JSON report contains the replay ID, event IDs, alert IDs, the expected matri
 
 [GitHub Actions](https://github.com/ChanduKomme/Detection-Engineering-SOC-Lab/actions/workflows/soc-lab-ci.yml) runs in two stages. The first runs the detection-as-code gates and the pytest suite. The second validates the Vector configuration, starts a fresh Compose stack, runs the full replay, builds the case file, and publishes both as the `replay-evidence` artifact.
 
+## Local run evidence
+
+All proof lives in the separate [`evidence/`](evidence/) folder, collected by Chandu Komme from the running lab on 2026-11-17.
+
+| Check | Result |
+|---|---|
+| Replays | `70e18092…` and `23803a1b…` (fresh CyberPulse stack) |
+| Telemetry events indexed | 67 per replay |
+| Alerts | 7 per replay: 0 missing, 0 unexpected, 6 of 6 near misses silent |
+| Rule evaluation | All 5 live rules evaluating (77–82 runs each) |
+| Independent check | Counts confirmed with direct OpenSearch queries |
+
+| | |
+|---|---|
+| ![Login](evidence/screenshots/01-cyberpulse-login.jpg) | ![Console](evidence/screenshots/02-detection-console-overview.jpg) |
+| ![SOC-012 alert](evidence/screenshots/04-soc012-alert-linked-to-dns-event.jpg) | ![Alert matrix](evidence/screenshots/03-alert-matrix-queue-and-telemetry.jpg) |
+
+See the [evidence index](evidence/README.md), the [alert matrix](evidence/live-run/alert-matrix.md), [results from OpenSearch](evidence/live-run/opensearch-results.json), and the [terminal output](evidence/terminal/).
+
 ## Project structure
 
 | Path | Contents |
@@ -208,10 +265,13 @@ The JSON report contains the replay ID, event IDs, alert IDs, the expected matri
 | [`config/vector/`](config/vector/) | Collector inputs and normalization |
 | [`config/elastalert2/`](config/elastalert2/) | Alert engine and the five live rules |
 | [`config/opensearch/`](config/opensearch/) | Index template with explicit field mappings |
+| [`config/dashboards/`](config/dashboards/) | CyberPulse console theme, branding assets, and login page |
+| [`dashboards/`](dashboards/) | Detection console saved objects and dashboard guide |
 | [`detection-rules/`](detection-rules/) | Sigma catalog, mapping notes, and ATT&CK Navigator layer |
 | [`detectlab/`](detectlab/) | Offline Sigma evaluator, linter, coverage generator, and CLI |
 | [`tests/`](tests/) | Detection unit tests and the pytest suite |
-| [`fixtures/`](fixtures/) and [`tools/`](tools/) | Replay scenarios, verification harness, and case-file generator |
+| [`fixtures/`](fixtures/) and [`tools/`](tools/) | Replay scenarios, verification harness, case-file generator, and dashboard generator |
+| [`evidence/`](evidence/) | Screenshots, live OpenSearch results, and terminal output from real runs |
 | [`threat-hunting/`](threat-hunting/) and [`docs/`](docs/) | Hunts, playbooks, investigation guide, telemetry guide, and coverage |
 | [`ai-agents/`](ai-agents/) | Analyst-controlled AI triage prompt |
 | [`Makefile`](Makefile) | Shortcuts for every lab task |
@@ -220,6 +280,12 @@ The JSON report contains the replay ID, event IDs, alert IDs, the expected matri
 
 Run the stack on a trusted local machine with synthetic or sanitized data. Host ports bind to loopback, and the services use the bundled OpenSearch demo TLS configuration. Keep the replay listener and administrative endpoints local. Replay addresses come from reserved documentation ranges. Threat-intelligence, case-management, and endpoint-forensics handoffs are analyst exercises that require separate tools.
 
+## Author
 
+**Chandu Komme** — designed, built, and validated this lab: the CyberPulse detection console and theme, the Compose deployment, Vector normalization pipeline, five live ElastAlert2 detections, the `detectlab` detection-as-code toolkit with its Sigma evaluator, linter, and ATT&CK coverage generator, the 52 detection unit tests and pytest suite, the Windows and network replay harness and CI pipeline, the incident case-file generator, the triage playbooks and hunting queries, the investigation worksheet, and the AI triage exercise.
 
+- GitHub: [ChanduKomme](https://github.com/ChanduKomme)
 
+## Credits and license
+
+Copyright © 2026 Chandu Komme. Version 1 of this lab started from the [Enterprise Detection Engineering SOC Lab](https://github.com/sandeepmothukuri/Enterprise-Detection-Engineering-SOC-Lab/tree/ec8e4f8ba318b81786a79dcf98fc064f55b4a306) by Sandeep Mothukuri, whose copyright and MIT terms are kept in [LICENSE](LICENSE) as the license requires. Released under the [MIT License](LICENSE).
