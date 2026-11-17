@@ -1,0 +1,17 @@
+# Author: Chandu Komme — CyberPulse SOC Lab
+# Sigma source: detection-rules/sigma/exfiltration/T1041_c2_exfil.yml
+name: "SOC-015 | T1041 | Upload-heavy outbound session"
+type: any
+index: soc-logs-telemetry
+timestamp_field: "@timestamp"
+query_delay: {seconds: 20}
+realert: {minutes: 15}
+query_key: source.ip
+filter:
+  - term: {event.dataset: zeek.conn}
+  - term: {network.direction: outbound}
+  - range: {source.bytes: {gte: 20000000}}
+  - range: {destination.bytes: {lte: 1000000}}
+  - range: {zeek.duration: {gte: 30}}
+include_match_in_root: true
+alert: [debug]

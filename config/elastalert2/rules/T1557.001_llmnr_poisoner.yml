@@ -1,0 +1,19 @@
+# Author: Chandu Komme — CyberPulse SOC Lab
+# Sigma source: detection-rules/sigma/credential-access/T1557_llmnr_poison.yml
+name: "SOC-014 | T1557.001 | LLMNR or NBT-NS poisoner answering many hosts"
+type: cardinality
+index: soc-logs-telemetry
+timestamp_field: "@timestamp"
+cardinality_field: destination.ip
+# Fires when one host answers name queries for 3 or more different clients.
+max_cardinality: 2
+timeframe: {minutes: 10}
+query_delay: {seconds: 20}
+realert: {minutes: 15}
+query_key: source.ip
+filter:
+  - term: {event.dataset: zeek.conn}
+  - term: {network.transport: udp}
+  - terms: {source.port: [5355, 137]}
+include_match_in_root: true
+alert: [debug]

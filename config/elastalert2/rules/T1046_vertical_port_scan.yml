@@ -1,0 +1,19 @@
+# Author: Chandu Komme — CyberPulse SOC Lab
+# Sigma source: detection-rules/sigma/discovery/T1046_network_scan.yml
+name: "SOC-013 | T1046 | Vertical port scan from one source"
+type: cardinality
+index: soc-logs-telemetry
+timestamp_field: "@timestamp"
+cardinality_field: destination.port
+# Fires when one source probes 20 or more distinct ports that refuse or ignore it.
+max_cardinality: 19
+timeframe: {minutes: 1}
+query_delay: {seconds: 20}
+realert: {minutes: 15}
+query_key: source.ip
+filter:
+  - term: {event.dataset: zeek.conn}
+  - term: {network.transport: tcp}
+  - terms: {zeek.conn_state: [REJ, S0, RSTOS0]}
+include_match_in_root: true
+alert: [debug]
