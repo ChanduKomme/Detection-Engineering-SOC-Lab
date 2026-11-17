@@ -73,7 +73,8 @@ source = '''
   millis = to_int(round(to_float!(record.ts) * 1000))
   . = {
     "@timestamp": from_unix_timestamp!(millis, unit: "milliseconds"),
-    "event": {"dataset": "zeek." + path.stream, "category": "network"}
+    "event": {"dataset": "zeek." + path.stream, "category": "network"},
+    "zeek": {}
   }
   source_ip = string(record."id.orig_h") ?? string(record.src) ?? ""
   dest_ip = string(record."id.resp_h") ?? string(record.dst) ?? ""
@@ -100,6 +101,7 @@ source = '''
       .network.direction = "external"
     }
   }
+  if .zeek == {} { del(.zeek) }
   if is_string(record.query) {
     query = string!(record.query)
     # Length feeds SOC-012, the long-DNS-name tunneling signal.
