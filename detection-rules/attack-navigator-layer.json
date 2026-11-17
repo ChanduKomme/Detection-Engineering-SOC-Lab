@@ -12,7 +12,7 @@
       "techniqueID": "T1003.001",
       "score": 1,
       "color": "#8ec8f0",
-      "comment": "Sigma: LSASS Memory Access \u2014 Credential Dumping",
+      "comment": "Sigma: LSASS Handle Opened With Memory-Read Rights by an Untrusted Process",
       "enabled": true,
       "showSubtechniques": true
     },
@@ -20,7 +20,7 @@
       "techniqueID": "T1021.002",
       "score": 1,
       "color": "#8ec8f0",
-      "comment": "Sigma: Lateral Movement via SMB",
+      "comment": "Sigma: Executable Written to an Administrative Share From Another Host",
       "enabled": true,
       "showSubtechniques": true
     },
@@ -28,7 +28,7 @@
       "techniqueID": "T1027",
       "score": 1,
       "color": "#8ec8f0",
-      "comment": "Sigma: Suspicious Encoded PowerShell Execution",
+      "comment": "Sigma: PowerShell Launched With an Encoded Command Payload",
       "enabled": true,
       "showSubtechniques": true
     },
@@ -36,7 +36,7 @@
       "techniqueID": "T1041",
       "score": 1,
       "color": "#8ec8f0",
-      "comment": "Sigma: Large Outbound Transfer in Zeek",
+      "comment": "Sigma: Large, Upload-Heavy Session From an Internal Host to the Internet",
       "enabled": true,
       "showSubtechniques": true
     },
@@ -44,7 +44,7 @@
       "techniqueID": "T1046",
       "score": 2,
       "color": "#2f7fd1",
-      "comment": "Live: SOC-011; Sigma: Network Port Scan (Zeek detection)",
+      "comment": "Live: SOC-011; Sigma: Zeek Scan Notice, Vertical Port Scan From One Source",
       "enabled": true,
       "showSubtechniques": true
     },
@@ -52,7 +52,7 @@
       "techniqueID": "T1047",
       "score": 1,
       "color": "#8ec8f0",
-      "comment": "Sigma: WMIC Remote Process Creation",
+      "comment": "Sigma: Process Spawned Through WMI or Created Remotely With WMIC",
       "enabled": true,
       "showSubtechniques": true
     },
@@ -60,7 +60,7 @@
       "techniqueID": "T1053.005",
       "score": 1,
       "color": "#8ec8f0",
-      "comment": "Sigma: Script-Related Scheduled Task Creation",
+      "comment": "Sigma: Scheduled Task Created to Run a LOLBin, Hidden Task or User-Path Payload",
       "enabled": true,
       "showSubtechniques": true
     },
@@ -68,7 +68,7 @@
       "techniqueID": "T1059.001",
       "score": 1,
       "color": "#8ec8f0",
-      "comment": "Sigma: Suspicious Encoded PowerShell Execution",
+      "comment": "Sigma: PowerShell Launched With an Encoded Command Payload",
       "enabled": true,
       "showSubtechniques": true
     },
@@ -84,7 +84,7 @@
       "techniqueID": "T1071.004",
       "score": 2,
       "color": "#2f7fd1",
-      "comment": "Live: SOC-012; Sigma: Unusually Long Zeek DNS Query",
+      "comment": "Live: SOC-012; Sigma: DNS Query With an Encoded-Looking Long Label or Total Length",
       "enabled": true,
       "showSubtechniques": true
     },
@@ -116,7 +116,7 @@
       "techniqueID": "T1547.001",
       "score": 1,
       "color": "#8ec8f0",
-      "comment": "Sigma: Persistence via Registry Run Keys",
+      "comment": "Sigma: Autorun Registry Value Pointing at a User-Writable Path or Script Host",
       "enabled": true,
       "showSubtechniques": true
     },
@@ -124,7 +124,7 @@
       "techniqueID": "T1550.002",
       "score": 1,
       "color": "#8ec8f0",
-      "comment": "Sigma: Pass-the-Hash Attack",
+      "comment": "Sigma: Logon Pattern Consistent With Pass-the-Hash",
       "enabled": true,
       "showSubtechniques": true
     },
@@ -132,7 +132,7 @@
       "techniqueID": "T1557.001",
       "score": 1,
       "color": "#8ec8f0",
-      "comment": "Sigma: Zeek LLMNR or NBT-NS Traffic",
+      "comment": "Sigma: Name-Resolution Poisoner Answering Many Hosts",
       "enabled": true,
       "showSubtechniques": true
     },
@@ -140,7 +140,7 @@
       "techniqueID": "T1562.001",
       "score": 1,
       "color": "#8ec8f0",
-      "comment": "Sigma: Windows Defender Disabled",
+      "comment": "Sigma: Microsoft Defender Protection Turned Off or Exclusion Added",
       "enabled": true,
       "showSubtechniques": true
     }

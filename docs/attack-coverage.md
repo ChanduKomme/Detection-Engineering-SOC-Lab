@@ -6,23 +6,23 @@
 
 | Technique | Name | Tactics | Live rule | Sigma rules | Unit tests |
 |---|---|---|---|---|---:|
-| [T1003.001](https://attack.mitre.org/techniques/T1003/001/) | OS Credential Dumping: LSASS Memory | credential access | — | LSASS Memory Access — Credential Dumping | 3 |
-| [T1021.002](https://attack.mitre.org/techniques/T1021/002/) | Remote Services: SMB/Windows Admin Shares | lateral movement | — | Lateral Movement via SMB | 3 |
-| [T1027](https://attack.mitre.org/techniques/T1027/) | Obfuscated Files or Information | defense evasion | — | Suspicious Encoded PowerShell Execution | 4 |
-| [T1041](https://attack.mitre.org/techniques/T1041/) | Exfiltration Over C2 Channel | exfiltration | — | Large Outbound Transfer in Zeek | 3 |
-| [T1046](https://attack.mitre.org/techniques/T1046/) | Network Service Discovery | discovery | SOC-011 | Network Port Scan (Zeek detection) | 2 |
-| [T1047](https://attack.mitre.org/techniques/T1047/) | Windows Management Instrumentation | execution | — | WMIC Remote Process Creation | 3 |
-| [T1053.005](https://attack.mitre.org/techniques/T1053/005/) | Scheduled Task/Job: Scheduled Task | execution, persistence, privilege escalation | — | Script-Related Scheduled Task Creation | 3 |
-| [T1059.001](https://attack.mitre.org/techniques/T1059/001/) | Command and Scripting Interpreter: PowerShell | execution | — | Suspicious Encoded PowerShell Execution | 4 |
+| [T1003.001](https://attack.mitre.org/techniques/T1003/001/) | OS Credential Dumping: LSASS Memory | credential access | — | LSASS Handle Opened With Memory-Read Rights by an Untrusted Process | 6 |
+| [T1021.002](https://attack.mitre.org/techniques/T1021/002/) | Remote Services: SMB/Windows Admin Shares | lateral movement | — | Executable Written to an Administrative Share From Another Host | 6 |
+| [T1027](https://attack.mitre.org/techniques/T1027/) | Obfuscated Files or Information | defense evasion | — | PowerShell Launched With an Encoded Command Payload | 6 |
+| [T1041](https://attack.mitre.org/techniques/T1041/) | Exfiltration Over C2 Channel | exfiltration | — | Large, Upload-Heavy Session From an Internal Host to the Internet | 5 |
+| [T1046](https://attack.mitre.org/techniques/T1046/) | Network Service Discovery | discovery | SOC-011 | Zeek Scan Notice<br>Vertical Port Scan From One Source | 14 |
+| [T1047](https://attack.mitre.org/techniques/T1047/) | Windows Management Instrumentation | execution | — | Process Spawned Through WMI or Created Remotely With WMIC | 5 |
+| [T1053.005](https://attack.mitre.org/techniques/T1053/005/) | Scheduled Task/Job: Scheduled Task | execution, persistence, privilege escalation | — | Scheduled Task Created to Run a LOLBin, Hidden Task or User-Path Payload | 5 |
+| [T1059.001](https://attack.mitre.org/techniques/T1059/001/) | Command and Scripting Interpreter: PowerShell | execution | — | PowerShell Launched With an Encoded Command Payload | 6 |
 | [T1071.001](https://attack.mitre.org/techniques/T1071/001/) | Application Layer Protocol: Web Protocols | command and control | SOC-010 | High-Severity Suricata Alert | 3 |
-| [T1071.004](https://attack.mitre.org/techniques/T1071/004/) | Application Layer Protocol: DNS | command and control | SOC-012 | Unusually Long Zeek DNS Query | 2 |
+| [T1071.004](https://attack.mitre.org/techniques/T1071/004/) | Application Layer Protocol: DNS | command and control | SOC-012 | DNS Query With an Encoded-Looking Long Label or Total Length | 6 |
 | [T1078](https://attack.mitre.org/techniques/T1078/) | Valid Accounts | initial access, persistence, privilege escalation, defense evasion | — | Successful Logon After Brute Force from the Same Source | 5 |
 | [T1110.001](https://attack.mitre.org/techniques/T1110/001/) | Brute Force: Password Guessing | credential access | SOC-002 | Repeated Windows Logon Failures from One Source<br>Successful Logon After Brute Force from the Same Source | 10 |
 | [T1110.003](https://attack.mitre.org/techniques/T1110/003/) | Brute Force: Password Spraying | credential access | SOC-003 | Password Spray from One Source | 5 |
-| [T1547.001](https://attack.mitre.org/techniques/T1547/001/) | Boot or Logon Autostart Execution: Registry Run Keys | persistence, privilege escalation | — | Persistence via Registry Run Keys | 2 |
-| [T1550.002](https://attack.mitre.org/techniques/T1550/002/) | Use Alternate Authentication Material: Pass the Hash | defense evasion, lateral movement | — | Pass-the-Hash Attack | 3 |
-| [T1557.001](https://attack.mitre.org/techniques/T1557/001/) | Adversary-in-the-Middle: LLMNR/NBT-NS Poisoning | credential access, collection | — | Zeek LLMNR or NBT-NS Traffic | 4 |
-| [T1562.001](https://attack.mitre.org/techniques/T1562/001/) | Impair Defenses: Disable or Modify Tools | defense evasion | — | Windows Defender Disabled | 2 |
+| [T1547.001](https://attack.mitre.org/techniques/T1547/001/) | Boot or Logon Autostart Execution: Registry Run Keys | persistence, privilege escalation | — | Autorun Registry Value Pointing at a User-Writable Path or Script Host | 6 |
+| [T1550.002](https://attack.mitre.org/techniques/T1550/002/) | Use Alternate Authentication Material: Pass the Hash | defense evasion, lateral movement | — | Logon Pattern Consistent With Pass-the-Hash | 6 |
+| [T1557.001](https://attack.mitre.org/techniques/T1557/001/) | Adversary-in-the-Middle: LLMNR/NBT-NS Poisoning | credential access, collection | — | Name-Resolution Poisoner Answering Many Hosts | 6 |
+| [T1562.001](https://attack.mitre.org/techniques/T1562/001/) | Impair Defenses: Disable or Modify Tools | defense evasion | — | Microsoft Defender Protection Turned Off or Exclusion Added | 5 |
 
 ---
 *CyberPulse SOC Lab — by [Chandu Komme](https://github.com/ChanduKomme)*

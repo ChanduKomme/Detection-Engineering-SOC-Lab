@@ -12,18 +12,26 @@ Five ElastAlert2 rules in [`config/elastalert2/rules/`](../config/elastalert2/ru
 
 Every one of the 16 Sigma files has positive and negative unit tests in [`tests/detections/`](../tests/detections/), run with `python -m detectlab test`. See [detection as code](../docs/detection-as-code.md) and the generated [ATT&CK coverage](../docs/attack-coverage.md). Load [`attack-navigator-layer.json`](attack-navigator-layer.json) in the ATT&CK Navigator for a heat map.
 
-The [Sigma catalog](sigma/) contains portable rules for the original source schemas. The Windows authentication file includes a base event selector and an event-count correlation. To deploy a Sigma reference, choose a compatible backend, map each rule's native fields to that data source, and verify positive and negative examples. Some references require Sysmon, Windows Defender Operational events, or raw Zeek fields that the normalized lab index does not carry.
+The [Sigma catalog](sigma/) holds 16 rule files written for the native source schemas. Several use correlations (event_count, value_count, temporal_ordered), and each one documents its false positives. To deploy a rule outside the lab, convert it with a pySigma backend, map the native fields to your data source, and re-run its unit tests.
 
-| Example rule | Native inputs |
-|---|---|
-| Windows failed-logon correlation | Windows Security event ID and source IP |
-| Encoded PowerShell | Windows process image and command line |
-| LSASS process access | Sysmon target image and access mask |
-| Scheduled task creation | Windows Security event 4698 and its task content |
-| Outbound volume | Zeek connection direction and originator bytes |
-| DNS query length | Raw Zeek DNS query |
-| Password spray | Windows Security event ID, source IP, and target account |
-| Logon after brute force | Ordered failure burst and success from one source IP |
+| Technique | Rule | How it decides |
+|---|---|---|
+| T1003.001 | LSASS memory-read handle | Sysmon 10 on lsass.exe with a memory-read access mask or a minidump call stack, excluding trusted security and system processes |
+| T1021.002 | Executable written to an admin share | Event 5145 write to ADMIN$ or C$ of an .exe, .dll or script, from a remote user account |
+| T1041 | Upload-heavy outbound session | Zeek connection uploading 20 MB or more while receiving under 1 MB, for at least 30 seconds |
+| T1046 | Scan notice and vertical port scan | Zeek scan notice, or 20 or more distinct failed ports from one source in a minute |
+| T1047 | WMI execution | WmiPrvSE spawning a shell or LOLBin, or wmic process call create against a remote node |
+| T1053.005 | Suspicious scheduled task | Event 4698 whose task runs a LOLBin, a user-path binary, or is hidden |
+| T1059.001 | Encoded PowerShell | Every -EncodedCommand abbreviation plus a base64 payload, including renamed PowerShell |
+| T1071.001 | High-severity IDS alert | Suricata alert with priority 1 or 2 |
+| T1071.004 | DNS tunneling | Query of 60 or more characters, a 40-character label, or a long TXT or NULL lookup |
+| T1078 | Logon after brute force | Failure burst followed by a success from the same source (temporal_ordered) |
+| T1110.001 | Repeated logon failures | 10 failures from one source in 5 minutes (event_count) |
+| T1110.003 | Password spray | 5 or more distinct accounts failing from one source in 10 minutes (value_count) |
+| T1547.001 | Autorun registry persistence | Run, RunOnce or Winlogon value launching a user-path binary or a script host |
+| T1550.002 | Pass-the-hash logon shape | Type 9 seclogo/Negotiate, or type 3 NTLM with a zero key length, excluding anonymous and computer accounts |
+| T1557.001 | LLMNR/NBT-NS poisoner | One host answering name queries for 3 or more clients in 10 minutes (value_count) |
+| T1562.001 | Defender tampering | Protection disabled, or an exclusion or real-time switch-off written to the Defender configuration |
 
 Run `python -m detectlab lint` to check the catalog, and validate with pySigma before converting a rule to another backend. Review the false-positive notes beside each rule. For operation of the active detection, use the [replay walkthrough](../README.md#detection-validation-and-evidence).
 
