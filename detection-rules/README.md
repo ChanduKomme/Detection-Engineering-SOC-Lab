@@ -1,6 +1,6 @@
 # Detection rules
 
-Five ElastAlert2 rules in [`config/elastalert2/rules/`](../config/elastalert2/rules/) run live on the normalized OpenSearch fields, and the replay verifies each one end to end.
+Eight ElastAlert2 rules in [`config/elastalert2/rules/`](../config/elastalert2/rules/) run live on the normalized OpenSearch fields, and the replay verifies each one end to end.
 
 | Live rule | Type | Logic | Sigma reference |
 |---|---|---|---|
@@ -9,6 +9,9 @@ Five ElastAlert2 rules in [`config/elastalert2/rules/`](../config/elastalert2/ru
 | SOC-010 | any | Suricata alert with severity 1 or 2 | [T1071.001_suricata_high_severity.yml](sigma/network/T1071.001_suricata_high_severity.yml) |
 | SOC-011 | any | Zeek `Scan::Port_Scan` notice | [T1046_network_scan.yml](sigma/discovery/T1046_network_scan.yml) |
 | SOC-012 | any | Zeek DNS name of 60+ characters | [T1071.004_dns_tunneling.yml](sigma/network/T1071.004_dns_tunneling.yml) |
+| SOC-013 | cardinality | 20+ distinct failed TCP ports per source in 1 minute | [T1046_network_scan.yml](sigma/discovery/T1046_network_scan.yml) |
+| SOC-014 | cardinality | 3+ clients answered on LLMNR/NBT-NS ports per source in 10 minutes | [T1557_llmnr_poison.yml](sigma/credential-access/T1557_llmnr_poison.yml) |
+| SOC-015 | any | Outbound session: 20 MB+ up, under 1 MB down, 30 s+ | [T1041_c2_exfil.yml](sigma/exfiltration/T1041_c2_exfil.yml) |
 
 Every one of the 16 Sigma files has positive and negative unit tests in [`tests/detections/`](../tests/detections/), run with `python -m detectlab test`. See [detection as code](../docs/detection-as-code.md) and the generated [ATT&CK coverage](../docs/attack-coverage.md). Load [`attack-navigator-layer.json`](attack-navigator-layer.json) in the ATT&CK Navigator for a heat map.
 

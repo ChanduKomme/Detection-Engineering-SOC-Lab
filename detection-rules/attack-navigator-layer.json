@@ -34,9 +34,9 @@
     },
     {
       "techniqueID": "T1041",
-      "score": 1,
-      "color": "#8ec8f0",
-      "comment": "Sigma: Large, Upload-Heavy Session From an Internal Host to the Internet",
+      "score": 2,
+      "color": "#2f7fd1",
+      "comment": "Live: SOC-015; Sigma: Large, Upload-Heavy Session From an Internal Host to the Internet",
       "enabled": true,
       "showSubtechniques": true
     },
@@ -44,7 +44,7 @@
       "techniqueID": "T1046",
       "score": 2,
       "color": "#2f7fd1",
-      "comment": "Live: SOC-011; Sigma: Zeek Scan Notice, Vertical Port Scan From One Source",
+      "comment": "Live: SOC-013, SOC-011; Sigma: Zeek Scan Notice, Vertical Port Scan From One Source",
       "enabled": true,
       "showSubtechniques": true
     },
@@ -130,9 +130,9 @@
     },
     {
       "techniqueID": "T1557.001",
-      "score": 1,
-      "color": "#8ec8f0",
-      "comment": "Sigma: Name-Resolution Poisoner Answering Many Hosts",
+      "score": 2,
+      "color": "#2f7fd1",
+      "comment": "Live: SOC-014; Sigma: Name-Resolution Poisoner Answering Many Hosts",
       "enabled": true,
       "showSubtechniques": true
     },
