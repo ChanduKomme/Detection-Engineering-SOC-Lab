@@ -1,20 +1,46 @@
-title: Zeek LLMNR or NBT-NS Traffic
-id: 637def39-8987-53c7-9e66-b60fc2159954
-status: experimental
-description: Highlights legacy name resolution traffic for investigation
-author: Chandu Komme (adapted from an MIT-licensed reference rule)
-tags: [attack.credential_access, attack.t1557.001]
+title: Host Answering LLMNR or NBT-NS Queries
+name: llmnr_nbns_unicast_answer
+id: 2673c1e1-19a6-4532-8f22-43f66ed77842
+status: test
+description: >-
+  A unicast UDP flow from source port 5355 (LLMNR) or 137 (NBT-NS) means a host
+  answered a name-resolution broadcast. One record is a building block.
+author: Chandu Komme
+date: 2026/11/17
 logsource:
-  category: network_connection
   product: zeek
+  service: conn
 detection:
-  selection_llmnr:
-    resp_p: 5355
+  answer:
     proto: udp
-  selection_nbns:
-    resp_p: 137
-    proto: udp
-  condition: selection_llmnr or selection_nbns
-level: medium
+    id.orig_p:
+      - 5355
+      - 137
+  multicast:
+    id.resp_h|cidr: '224.0.0.0/4'
+  condition: answer and not multicast
+level: low
+---
+title: Name-Resolution Poisoner Answering Many Hosts
+id: c60b5341-1243-478e-9aa6-6c6e410857ff
+status: test
+description: >-
+  Correlates LLMNR and NBT-NS answers by responder. A single host answering
+  name queries for three or more different clients within ten minutes behaves
+  like Responder or Inveigh harvesting NTLM challenges.
+references:
+  - https://attack.mitre.org/techniques/T1557/001/
+author: Chandu Komme
+date: 2026/11/17
+correlation:
+  type: value_count
+  rules: [llmnr_nbns_unicast_answer]
+  group-by: [id.orig_h]
+  timespan: 10m
+  condition:
+    field: id.resp_h
+    gte: 3
+tags: [attack.credential_access, attack.collection, attack.t1557.001]
 falsepositives:
-  - Routine legacy name resolution on the local network.
+  - A legacy name server or print server that legitimately answers NetBIOS queries.
+level: high

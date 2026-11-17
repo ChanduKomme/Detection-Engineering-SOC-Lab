@@ -1,26 +1,49 @@
-title: LSASS Memory Access — Credential Dumping
-id: 9c1736e4-f147-5c14-a370-6fddf6342975
-status: experimental
-description: Detects attempts to dump credentials from LSASS memory (Mimikatz, etc.)
-author: Chandu Komme (adapted from an MIT-licensed reference rule)
+title: LSASS Handle Opened With Memory-Read Rights by an Untrusted Process
+id: 318291de-12ce-469f-af0e-8b70a903a815
+status: test
+description: >-
+  Flags a process opening lsass.exe with access masks that allow reading process
+  memory, or with a call stack through the debug-help minidump libraries. Known
+  security and system components are excluded so the rule stays quiet on a
+  normal host and fires on credential-dumping tools.
+references:
+  - https://attack.mitre.org/techniques/T1003/001/
+author: Chandu Komme
+date: 2026/11/17
 tags: [attack.credential_access, attack.t1003.001]
 logsource:
-  category: process_access
   product: windows
+  category: process_access
 detection:
-  selection:
+  target:
+    EventID: 10
     TargetImage|endswith: '\lsass.exe'
+  read_access:
     GrantedAccess:
       - '0x1010'
+      - '0x1038'
       - '0x1410'
-      - '0x147a'
+      - '0x1438'
+      - '0x143a'
       - '0x1fffff'
-  filter:
+  dump_stack:
+    CallTrace|contains:
+      - 'dbghelp.dll'
+      - 'dbgcore.dll'
+      - 'comsvcs.dll'
+  trusted_security:
     SourceImage|endswith:
       - '\MsMpEng.exe'
-      - '\csrss.exe'
-      - '\wininit.exe'
-  condition: selection and not filter
-level: critical
+      - '\MsSense.exe'
+      - '\SenseIR.exe'
+  trusted_system:
+    SourceImage:
+      - 'C:\Windows\System32\csrss.exe'
+      - 'C:\Windows\System32\wininit.exe'
+      - 'C:\Windows\System32\wbem\WmiPrvSE.exe'
+  condition: target and (read_access or dump_stack) and not 1 of trusted_*
+fields: [SourceImage, GrantedAccess, CallTrace, SourceUser]
 falsepositives:
-  - Endpoint security and diagnostic software inspecting LSASS.
+  - EDR or backup agents not yet in the trusted list.
+  - Administrators capturing an LSASS dump for a support case.
+level: high

@@ -1,15 +1,27 @@
 # Author: Chandu Komme
 rule: detection-rules/sigma/credential-access/T1003.001_lsass_dump.yml
 cases:
-  - name: unknown tool opens LSASS with full access
+  - name: unknown binary reads LSASS memory
     expect: match
     events:
-      - event: {TargetImage: 'C:\Windows\System32\lsass.exe', GrantedAccess: '0x1fffff', SourceImage: 'C:\Users\Public\procdump64.exe'}
-  - name: Defender scanning LSASS is filtered
+      - event: {EventID: 10, TargetImage: 'C:\Windows\System32\lsass.exe', GrantedAccess: '0x1410', SourceImage: 'C:\Users\Public\svc.exe'}
+  - name: low access mask but minidump call stack
+    expect: match
+    events:
+      - event: {EventID: 10, TargetImage: 'C:\Windows\System32\lsass.exe', GrantedAccess: '0x1000', SourceImage: 'C:\Windows\System32\rundll32.exe', CallTrace: 'C:\Windows\SYSTEM32\ntdll.dll+9d204|C:\Windows\System32\comsvcs.dll+2b2d8'}
+  - name: Defender scanning LSASS is trusted
     expect: no_match
     events:
-      - event: {TargetImage: 'C:\Windows\System32\lsass.exe', GrantedAccess: '0x1410', SourceImage: 'C:\ProgramData\Microsoft\Windows Defender\Platform\MsMpEng.exe'}
-  - name: low-privilege query access is not in the list
+      - event: {EventID: 10, TargetImage: 'C:\Windows\System32\lsass.exe', GrantedAccess: '0x1410', SourceImage: 'C:\ProgramData\Microsoft\Windows Defender\Platform\4.18\MsMpEng.exe'}
+  - name: csrss with full access is trusted
     expect: no_match
     events:
-      - event: {TargetImage: 'C:\Windows\System32\lsass.exe', GrantedAccess: '0x1000', SourceImage: 'C:\Tools\taskmgr.exe'}
+      - event: {EventID: 10, TargetImage: 'C:\Windows\System32\lsass.exe', GrantedAccess: '0x1fffff', SourceImage: 'C:\Windows\System32\csrss.exe'}
+  - name: query-only access without dump libraries
+    expect: no_match
+    events:
+      - event: {EventID: 10, TargetImage: 'C:\Windows\System32\lsass.exe', GrantedAccess: '0x1000', SourceImage: 'C:\Tools\procexp64.exe', CallTrace: 'C:\Windows\SYSTEM32\ntdll.dll+9d204'}
+  - name: memory access to a different process
+    expect: no_match
+    events:
+      - event: {EventID: 10, TargetImage: 'C:\Windows\explorer.exe', GrantedAccess: '0x1410', SourceImage: 'C:\Users\Public\svc.exe'}

@@ -1,19 +1,35 @@
 # Author: Chandu Komme
 rule: detection-rules/sigma/credential-access/T1557_llmnr_poison.yml
 cases:
-  - name: LLMNR response traffic
+  - name: one host answers LLMNR for three clients
     expect: match
     events:
-      - event: {resp_p: 5355, proto: udp, id.orig_h: 192.0.2.50}
-  - name: NBNS response traffic
+      - repeat: 3
+        every: 20s
+        event: {proto: udp, id.orig_h: 192.0.2.66, id.orig_p: 5355, id.resp_h: '192.0.2.{i}', id.resp_p: 51000}
+  - name: NBT-NS answers to three clients
     expect: match
     events:
-      - event: {resp_p: 137, proto: udp}
-  - name: ordinary DNS
+      - repeat: 3
+        event: {proto: udp, id.orig_h: 192.0.2.66, id.orig_p: 137, id.resp_h: '192.0.2.1{i}', id.resp_p: 137}
+  - name: answers to only two clients
     expect: no_match
     events:
-      - event: {resp_p: 53, proto: udp}
-  - name: LLMNR port over TCP
+      - repeat: 2
+        event: {proto: udp, id.orig_h: 192.0.2.66, id.orig_p: 5355, id.resp_h: '192.0.2.{i}', id.resp_p: 51000}
+  - name: multicast queries are not answers
     expect: no_match
     events:
-      - event: {resp_p: 5355, proto: tcp}
+      - repeat: 5
+        event: {proto: udp, id.orig_h: '192.0.2.{i}', id.orig_p: 5355, id.resp_h: 224.0.0.252, id.resp_p: 5355}
+  - name: answers spread across ten-minute windows
+    expect: no_match
+    events:
+      - repeat: 3
+        every: 8m
+        event: {proto: udp, id.orig_h: 192.0.2.66, id.orig_p: 5355, id.resp_h: '192.0.2.{i}', id.resp_p: 51000}
+  - name: ordinary DNS answers
+    expect: no_match
+    events:
+      - repeat: 5
+        event: {proto: udp, id.orig_h: 192.0.2.53, id.orig_p: 53, id.resp_h: '192.0.2.{i}', id.resp_p: 51000}
