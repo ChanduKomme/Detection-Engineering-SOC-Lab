@@ -1,0 +1,13 @@
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
+.venv/
+/reports/
+/telemetry/**
+!/telemetry/zeek/
+!/telemetry/suricata/
+!/telemetry/zeek/.gitkeep
+!/telemetry/suricata/.gitkeep
+.pytest_cache/
