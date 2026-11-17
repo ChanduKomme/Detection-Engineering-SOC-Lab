@@ -1,0 +1,28 @@
+# Fresh CyberPulse stack — Chandu Komme, 2026-11-17 (admin password line removed)
+$ ./setup.sh
+[+] up 3/3
+ ✔ Network cyberpulse-soc-lab_default          Created
+ ✔ Volume cyberpulse-soc-lab_opensearch-data   Created
+ ✔ Container cyberpulse-soc-lab-opensearch-1   Healthy
+{"acknowledged":true}
+[+] up 5/5
+ ✔ Container cyberpulse-soc-lab-opensearch-1   Healthy
+ ✔ Volume cyberpulse-soc-lab_vector-data       Created
+ ✔ Container cyberpulse-soc-lab-dashboards-1   Healthy
+ ✔ Container cyberpulse-soc-lab-elastalert2-1  Healthy
+ ✔ Container cyberpulse-soc-lab-vector-1       Healthy
+Waiting for OpenSearch Dashboards.
+Imported the CyberPulse SOC dashboard.
+NAME                               IMAGE                                            STATUS                  PORTS
+cyberpulse-soc-lab-dashboards-1    opensearchproject/opensearch-dashboards:2.19.5   Up 6 seconds            127.0.0.1:5601->5601/tcp
+cyberpulse-soc-lab-elastalert2-1   jertel/elastalert2:2.32.0                        Up 6 seconds
+cyberpulse-soc-lab-opensearch-1    opensearchproject/opensearch:2.19.5              Up 23 seconds (healthy) 127.0.0.1:9201->9200/tcp
+cyberpulse-soc-lab-vector-1        timberio/vector:0.61.0-debian                    Up 6 seconds            127.0.0.1:8688->8688/tcp
+
+CyberPulse SOC Lab is running.
+  Console:  http://127.0.0.1:5601  (user admin, password in .env)
+  Replay:   python3 tools/replay.py --report reports/replay.json
+
+$ python3 tools/replay.py --report reports/replay.json
+Replay 23803a1b-736c-4987-b8d5-963d232b4f9b: 61 Windows events, 6 network records, 5 live rules.
+# Results for this replay were read back from OpenSearch: see ../live-run/

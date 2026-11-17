@@ -1,0 +1,17 @@
+# Independent checks against OpenSearch for replay 70e18092 (not using the replay script)
+$ curl -sk -u "admin:$OSPW" https://127.0.0.1:9201/soc-logs-telemetry/_count \
+    -H 'Content-Type: application/json' \
+    -d "{\"query\":{\"term\":{\"labels.replay_id\":\"$REPLAY\"}}}"
+{"count":67,"_shards":{"total":1,"successful":1,"skipped":0,"failed":0}}
+
+$ curl -sk -u "admin:$OSPW" https://127.0.0.1:9201/soc-alerts/_search ... | python3 -m json.tool | grep -E "rule_name|scenario"
+"rule_name": "SOC-002 | T1110.001 | Repeated Windows logon failures",   "scenario": "at-threshold"
+"rule_name": "SOC-002 | T1110.001 | Repeated Windows logon failures",   "scenario": "spray-and-brute-force"
+"rule_name": "SOC-003 | T1110.003 | Password spray from one source",    "scenario": "password-spray"
+"rule_name": "SOC-003 | T1110.003 | Password spray from one source",    "scenario": "spray-and-brute-force"
+"rule_name": "SOC-011 | T1046 | Zeek port scan notice",                 "scenario": "port-scan"
+"rule_name": "SOC-012 | T1071.004 | Unusually long DNS query",           "scenario": "dns-tunnel"
+"rule_name": "SOC-010 | T1071.001 | High-severity Suricata alert",      "scenario": "ids-high-severity"
+
+$ python3 tools/case_report.py reports/replay.json -o reports/case.md
+Saved case file to reports/case.md

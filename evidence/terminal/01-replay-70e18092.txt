@@ -1,0 +1,18 @@
+# Replay run 1 — Chandu Komme, 2026-11-17, local Docker Compose lab (OpenSearch on 9201)
+$ python3 tools/replay.py --opensearch-port 9201 --report reports/replay.json
+Replay 70e18092-f768-48ea-8b5e-2ae9e2b570d0: 61 Windows events, 6 network records, 5 live rules.
+scenario                 events  alerts
+at-threshold                 10  SOC-002
+below-threshold               9  none
+mixed-outcomes               10  none
+split-sources                10  none
+password-spray                6  SOC-003
+spray-below-threshold         4  none
+spray-and-brute-force        12  SOC-002, SOC-003
+port-scan                     1  SOC-011
+benign-notice                 1  none
+dns-tunnel                    1  SOC-012
+dns-normal                    1  none
+ids-high-severity             1  SOC-010
+ids-low-severity              1  none
+Saved evidence to reports/replay.json

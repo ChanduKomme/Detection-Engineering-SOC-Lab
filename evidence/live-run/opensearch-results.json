@@ -1,0 +1,225 @@
+{
+  "collected_by": "Chandu Komme",
+  "collected_at": "2026-11-17T17:48:00Z",
+  "source": "OpenSearch 2.19.5 via the CyberPulse console API proxy",
+  "replay_id": "23803a1b-736c-4987-b8d5-963d232b4f9b",
+  "cluster": {
+    "status": "yellow",
+    "nodes": 1,
+    "active_shards": 14,
+    "note": "yellow is expected on a single-node lab (replica shards cannot be assigned)"
+  },
+  "totals": {
+    "telemetry_events": 67,
+    "scenarios": 13,
+    "alerts": 7,
+    "rules_evaluating": 5
+  },
+  "scenarios": [
+    {
+      "scenario": "spray-and-brute-force",
+      "events": 12,
+      "datasets": {
+        "windows.security": 12
+      },
+      "outcomes": {
+        "failure": 12
+      },
+      "distinct_accounts": 6
+    },
+    {
+      "scenario": "at-threshold",
+      "events": 10,
+      "datasets": {
+        "windows.security": 10
+      },
+      "outcomes": {
+        "failure": 10
+      },
+      "distinct_accounts": 1
+    },
+    {
+      "scenario": "mixed-outcomes",
+      "events": 10,
+      "datasets": {
+        "windows.security": 10
+      },
+      "outcomes": {
+        "failure": 9,
+        "success": 1
+      },
+      "distinct_accounts": 1
+    },
+    {
+      "scenario": "split-sources",
+      "events": 10,
+      "datasets": {
+        "windows.security": 10
+      },
+      "outcomes": {
+        "failure": 10
+      },
+      "distinct_accounts": 1
+    },
+    {
+      "scenario": "below-threshold",
+      "events": 9,
+      "datasets": {
+        "windows.security": 9
+      },
+      "outcomes": {
+        "failure": 9
+      },
+      "distinct_accounts": 1
+    },
+    {
+      "scenario": "password-spray",
+      "events": 6,
+      "datasets": {
+        "windows.security": 6
+      },
+      "outcomes": {
+        "failure": 6
+      },
+      "distinct_accounts": 6
+    },
+    {
+      "scenario": "spray-below-threshold",
+      "events": 4,
+      "datasets": {
+        "windows.security": 4
+      },
+      "outcomes": {
+        "failure": 4
+      },
+      "distinct_accounts": 4
+    },
+    {
+      "scenario": "benign-notice",
+      "events": 1,
+      "datasets": {
+        "zeek.notice": 1
+      }
+    },
+    {
+      "scenario": "dns-normal",
+      "events": 1,
+      "datasets": {
+        "zeek.dns": 1
+      }
+    },
+    {
+      "scenario": "dns-tunnel",
+      "events": 1,
+      "datasets": {
+        "zeek.dns": 1
+      }
+    },
+    {
+      "scenario": "ids-high-severity",
+      "events": 1,
+      "datasets": {
+        "suricata.eve": 1
+      }
+    },
+    {
+      "scenario": "ids-low-severity",
+      "events": 1,
+      "datasets": {
+        "suricata.eve": 1
+      }
+    },
+    {
+      "scenario": "port-scan",
+      "events": 1,
+      "datasets": {
+        "zeek.notice": 1
+      }
+    }
+  ],
+  "alerts": [
+    {
+      "alert_id": "-t6V6qEBIQJZCGNiWBnh",
+      "rule": "SOC-003 | T1110.003 | Password spray from one source",
+      "scenario": "password-spray",
+      "source_event_id": "23803a1b-736c-4987-b8d5-963d232b4f9b-44",
+      "alert_time": "2026-11-17T17:36:58.586679Z",
+      "alert_sent": true
+    },
+    {
+      "alert_id": "_d6V6qEBIQJZCGNiWRlX",
+      "rule": "SOC-003 | T1110.003 | Password spray from one source",
+      "scenario": "spray-and-brute-force",
+      "source_event_id": "23803a1b-736c-4987-b8d5-963d232b4f9b-54",
+      "alert_time": "2026-11-17T17:36:58.707731Z",
+      "alert_sent": true
+    },
+    {
+      "alert_id": "Ad6V6qEBIQJZCGNiXBrO",
+      "rule": "SOC-002 | T1110.001 | Repeated Windows logon failures",
+      "scenario": "at-threshold",
+      "source_event_id": "23803a1b-736c-4987-b8d5-963d232b4f9b-10",
+      "alert_time": "2026-11-17T17:36:59.591886Z",
+      "alert_sent": true
+    },
+    {
+      "alert_id": "A96V6qEBIQJZCGNiXBr7",
+      "rule": "SOC-002 | T1110.001 | Repeated Windows logon failures",
+      "scenario": "spray-and-brute-force",
+      "source_event_id": "23803a1b-736c-4987-b8d5-963d232b4f9b-59",
+      "alert_time": "2026-11-17T17:36:59.637902Z",
+      "alert_sent": true
+    },
+    {
+      "alert_id": "CN6V6qEBIQJZCGNicRoq",
+      "rule": "SOC-012 | T1071.004 | Unusually long DNS query",
+      "scenario": "dns-tunnel",
+      "source_event_id": "23803a1b-736c-4987-b8d5-963d232b4f9b-n03",
+      "alert_time": "2026-11-17T17:37:04.805312Z",
+      "alert_sent": true
+    },
+    {
+      "alert_id": "Dt6V6qEBIQJZCGNidhpD",
+      "rule": "SOC-010 | T1071.001 | High-severity Suricata alert",
+      "scenario": "ids-high-severity",
+      "source_event_id": "39033637663596005",
+      "alert_time": "2026-11-17T17:37:06.111260Z",
+      "alert_sent": true
+    },
+    {
+      "alert_id": "Et6V6qEBIQJZCGNigxqS",
+      "rule": "SOC-011 | T1046 | Zeek port scan notice",
+      "scenario": "port-scan",
+      "source_event_id": "23803a1b-736c-4987-b8d5-963d232b4f9b-n01",
+      "alert_time": "2026-11-17T17:37:09.515942Z",
+      "alert_sent": true
+    }
+  ],
+  "rule_evaluations": [
+    {
+      "rule": "SOC-002 | T1110.001 | Repeated Windows logon failures",
+      "evaluation_runs": 82,
+      "evaluated_through": "2026-11-17T17:46:37.869Z"
+    },
+    {
+      "rule": "SOC-003 | T1110.003 | Password spray from one source",
+      "evaluation_runs": 79,
+      "evaluated_through": "2026-11-17T17:46:35.507Z"
+    },
+    {
+      "rule": "SOC-010 | T1071.001 | High-severity Suricata alert",
+      "evaluation_runs": 80,
+      "evaluated_through": "2026-11-17T17:46:29.837Z"
+    },
+    {
+      "rule": "SOC-011 | T1046 | Zeek port scan notice",
+      "evaluation_runs": 81,
+      "evaluated_through": "2026-11-17T17:46:28.678Z"
+    },
+    {
+      "rule": "SOC-012 | T1071.004 | Unusually long DNS query",
+      "evaluation_runs": 77,
+      "evaluated_through": "2026-11-17T17:46:24.227Z"
+    }
+  ]
+}
