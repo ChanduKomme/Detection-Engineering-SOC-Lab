@@ -1,11 +1,5 @@
 # Detection Engineering SOC Lab
 
-[![SOC Lab validation](https://github.com/ChanduKomme/Detection-Engineering-SOC-Lab/actions/workflows/soc-lab-ci.yml/badge.svg)](https://github.com/ChanduKomme/Detection-Engineering-SOC-Lab/actions/workflows/soc-lab-ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![MITRE ATT&CK](https://img.shields.io/badge/MITRE-ATT%26CK-red)](docs/attack-coverage.md)
-![Version](https://img.shields.io/badge/version-2.0.0-blue)
-![Detection tests](https://img.shields.io/badge/detection%20tests-52%20passing-brightgreen)
-
 A hands-on Security Operations Center lab that treats detections as code. Rules are linted, unit-tested against positive and near-miss events, mapped to MITRE ATT&CK, and then proven end to end on a live SIEM pipeline that replays Windows, Zeek, and Suricata telemetry and checks every alert.
 
 - **Author** — [Chandu Komme](https://github.com/ChanduKomme)
