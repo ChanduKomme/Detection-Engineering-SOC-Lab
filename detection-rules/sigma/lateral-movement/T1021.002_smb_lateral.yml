@@ -1,20 +1,40 @@
-title: Lateral Movement via SMB
-id: 1b0d0a6c-1fba-5234-9d9b-4fbfa424c43c
-status: experimental
-description: Detects lateral movement via SMB file shares
-author: Chandu Komme (adapted from an MIT-licensed reference rule)
+title: Executable Written to an Administrative Share From Another Host
+id: 5c74c77d-4157-45e5-be2a-3d51e9697611
+status: test
+description: >-
+  Uses detailed file-share auditing (event 5145) to catch a remote user writing a
+  program or script to ADMIN$, C$ or IPC$. That is the staging step of
+  PsExec-style lateral movement. Local access and computer accounts are excluded.
+references:
+  - https://attack.mitre.org/techniques/T1021/002/
+author: Chandu Komme
+date: 2026/11/17
 tags: [attack.lateral_movement, attack.t1021.002]
 logsource:
-  category: network_connection
   product: windows
+  service: security
 detection:
-  selection:
-    EventID: 3
-    DestinationPort: 445
-    Initiated: 'true'
-  filter:
-    Image|endswith: ['\explorer.exe', '\svchost.exe', '\System']
-  condition: selection and not filter
-level: medium
+  admin_share_write:
+    EventID: 5145
+    ShareName|endswith:
+      - '\ADMIN$'
+      - '\C$'
+    AccessList|contains: '%%4417'
+  payload:
+    RelativeTargetName|endswith:
+      - '.exe'
+      - '.dll'
+      - '.bat'
+      - '.ps1'
+      - '.vbs'
+  local_source:
+    IpAddress:
+      - '127.0.0.1'
+      - '::1'
+  computer_account:
+    SubjectUserName|endswith: '$'
+  condition: admin_share_write and payload and not (local_source or computer_account)
+fields: [SubjectUserName, IpAddress, ShareName, RelativeTargetName]
 falsepositives:
-  - Administrative file shares and application traffic.
+  - Software deployment tools that push installers through admin shares.
+level: high

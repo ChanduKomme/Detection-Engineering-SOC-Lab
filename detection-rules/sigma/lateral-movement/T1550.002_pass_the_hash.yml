@@ -1,21 +1,37 @@
-title: Pass-the-Hash Attack
-id: 1b98641c-89ae-5ac3-9e61-365309c2bb0b
-status: experimental
-description: Detects pass-the-hash attacks using harvested NTLM hashes
-author: Chandu Komme (adapted from an MIT-licensed reference rule)
-tags: [attack.lateral_movement, attack.t1550.002]
+title: Logon Pattern Consistent With Pass-the-Hash
+id: d2ee1c07-06e7-4e25-9ce8-674d9bdf0a0d
+status: test
+description: >-
+  Covers two pass-the-hash shapes. A NewCredentials logon (type 9) through
+  seclogo with Negotiate is what credential-injection tools produce locally.
+  A network NTLM logon (type 3) with a zero session-key length from a user
+  account is the remote shape. Anonymous and computer-account logons are excluded.
+references:
+  - https://attack.mitre.org/techniques/T1550/002/
+author: Chandu Komme
+date: 2026/11/17
+tags: [attack.defense_evasion, attack.lateral_movement, attack.t1550.002]
 logsource:
   product: windows
   service: security
 detection:
-  selection:
+  successful_logon:
     EventID: 4624
+  injected_credentials:
+    LogonType: 9
+    LogonProcessName|startswith: 'seclogo'
+    AuthenticationPackageName: Negotiate
+  remote_ntlm:
     LogonType: 3
     AuthenticationPackageName: NTLM
     KeyLength: 0
-  filter:
-    SubjectUserName|endswith: '$'
-  condition: selection and not filter
-level: high
+  anonymous:
+    TargetUserName: 'ANONYMOUS LOGON'
+  computer_account:
+    TargetUserName|endswith: '$'
+  condition: successful_logon and (injected_credentials or remote_ntlm) and not (anonymous or computer_account)
+fields: [TargetUserName, IpAddress, WorkstationName, LogonType]
 falsepositives:
-  - Legacy or application-specific NTLM network logons.
+  - RunAs /netonly used by administrators (type 9 logons).
+  - Legacy applications that still authenticate with NTLM.
+level: high

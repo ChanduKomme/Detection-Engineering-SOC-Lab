@@ -1,15 +1,27 @@
 # Author: Chandu Komme
 rule: detection-rules/sigma/lateral-movement/T1021.002_smb_lateral.yml
 cases:
-  - name: unusual process opens SMB connection
+  - name: executable written to ADMIN$ from another host
     expect: match
     events:
-      - event: {EventID: 3, DestinationPort: 445, Initiated: 'true', Image: 'C:\Users\Public\psexec.exe'}
-  - name: Explorer browsing a file share is filtered
+      - event: {EventID: 5145, ShareName: '\\*\ADMIN$', AccessList: '%%4417 %%4418', RelativeTargetName: 'PSEXESVC.exe', SubjectUserName: alice, IpAddress: 192.0.2.50}
+  - name: script dropped on C$
+    expect: match
+    events:
+      - event: {EventID: 5145, ShareName: '\\*\C$', AccessList: '%%4417', RelativeTargetName: 'Users\Public\run.ps1', SubjectUserName: alice, IpAddress: 192.0.2.50}
+  - name: read-only access to ADMIN$
     expect: no_match
     events:
-      - event: {EventID: 3, DestinationPort: 445, Initiated: 'true', Image: 'C:\Windows\explorer.exe'}
-  - name: inbound SMB connection
+      - event: {EventID: 5145, ShareName: '\\*\ADMIN$', AccessList: '%%4416', RelativeTargetName: 'tool.exe', SubjectUserName: alice, IpAddress: 192.0.2.50}
+  - name: document written to a normal share
     expect: no_match
     events:
-      - event: {EventID: 3, DestinationPort: 445, Initiated: 'false', Image: 'C:\Users\Public\psexec.exe'}
+      - event: {EventID: 5145, ShareName: '\\*\Finance', AccessList: '%%4417', RelativeTargetName: 'report.exe', SubjectUserName: alice, IpAddress: 192.0.2.50}
+  - name: computer account writing to ADMIN$
+    expect: no_match
+    events:
+      - event: {EventID: 5145, ShareName: '\\*\ADMIN$', AccessList: '%%4417', RelativeTargetName: 'agent.exe', SubjectUserName: 'SCCM01$', IpAddress: 192.0.2.60}
+  - name: local loopback access
+    expect: no_match
+    events:
+      - event: {EventID: 5145, ShareName: '\\*\C$', AccessList: '%%4417', RelativeTargetName: 'setup.exe', SubjectUserName: alice, IpAddress: '::1'}

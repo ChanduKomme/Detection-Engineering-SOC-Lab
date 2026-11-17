@@ -1,15 +1,27 @@
 # Author: Chandu Komme
 rule: detection-rules/sigma/lateral-movement/T1550.002_pass_the_hash.yml
 cases:
-  - name: NTLM network logon with zero key length by a user
+  - name: credential injection through seclogo
     expect: match
     events:
-      - event: {EventID: 4624, LogonType: 3, AuthenticationPackageName: NTLM, KeyLength: 0, SubjectUserName: alice}
-  - name: machine account is filtered
+      - event: {EventID: 4624, LogonType: 9, LogonProcessName: 'seclogo', AuthenticationPackageName: Negotiate, TargetUserName: alice}
+  - name: remote NTLM logon with zero key length
+    expect: match
+    events:
+      - event: {EventID: 4624, LogonType: 3, AuthenticationPackageName: NTLM, KeyLength: 0, TargetUserName: alice, IpAddress: 192.0.2.40}
+  - name: computer account is excluded
     expect: no_match
     events:
-      - event: {EventID: 4624, LogonType: 3, AuthenticationPackageName: NTLM, KeyLength: 0, SubjectUserName: 'WS01$'}
+      - event: {EventID: 4624, LogonType: 3, AuthenticationPackageName: NTLM, KeyLength: 0, TargetUserName: 'FS01$'}
+  - name: anonymous logon is excluded
+    expect: no_match
+    events:
+      - event: {EventID: 4624, LogonType: 3, AuthenticationPackageName: NTLM, KeyLength: 0, TargetUserName: 'ANONYMOUS LOGON'}
   - name: Kerberos network logon
     expect: no_match
     events:
-      - event: {EventID: 4624, LogonType: 3, AuthenticationPackageName: Kerberos, KeyLength: 0, SubjectUserName: alice}
+      - event: {EventID: 4624, LogonType: 3, AuthenticationPackageName: Kerberos, KeyLength: 0, TargetUserName: alice}
+  - name: NTLMv2 logon with a session key
+    expect: no_match
+    events:
+      - event: {EventID: 4624, LogonType: 3, AuthenticationPackageName: NTLM, KeyLength: 128, TargetUserName: alice}
