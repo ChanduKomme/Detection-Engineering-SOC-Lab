@@ -27,7 +27,7 @@ def test_visualizations_are_valid_and_colored():
             json.loads(obj["attributes"]["uiStateJSON"])
     donut = next(o for o in objects() if o["id"] == "cp-alerts-donut")
     colors = json.loads(donut["attributes"]["uiStateJSON"])["vis"]["colors"]
-    assert len(colors) == 5 and all(c.startswith("#") for c in colors.values())
+    assert len(colors) == len(build_dashboard.RULE_COLORS) == 8 and all(c.startswith("#") for c in colors.values())
 
 
 def test_dashboard_lays_out_every_panel_without_overlap():

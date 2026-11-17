@@ -9,6 +9,9 @@ One playbook per live rule. Each starts from the alert in `soc-alerts`, pivots i
 | [SOC-010](#soc-010) | T1071.001 Web Protocols | High | Suricata alert with priority 1 or 2 |
 | [SOC-011](#soc-011) | T1046 Network Service Discovery | Medium | Zeek `Scan::Port_Scan` notice |
 | [SOC-012](#soc-012) | T1071.004 DNS | Medium | Zeek DNS query name of 60+ characters |
+| [SOC-013](#soc-013) | T1046 Network Service Discovery | Medium | 20+ distinct refused or unanswered TCP ports from one source in 1 minute |
+| [SOC-014](#soc-014) | T1557.001 LLMNR/NBT-NS Poisoning | High | One host answering LLMNR or NBT-NS for 3+ clients in 10 minutes |
+| [SOC-015](#soc-015) | T1041 Exfiltration Over C2 Channel | Critical | Outbound session uploading 20 MB+ while receiving under 1 MB, lasting 30 s+ |
 
 ## SOC-002
 
@@ -59,6 +62,36 @@ One playbook per live rule. Each starts from the alert in `soc-alerts`, pivots i
 3. **Corroborate.** Find the process issuing the queries on the source host and whether the domain is newly registered.
 4. **Contain (real environment).** Sinkhole the domain and isolate the host if tunneling is confirmed.
 5. **Tune.** Allow-list confirmed vendor domains by parent domain with an owner and review date.
+
+## SOC-013
+
+**Vertical port scan from one source — T1046**
+
+1. **Scope.** List the ports the source probed and which ones answered (`zeek.conn_state: SF`) with the network hunt in [network.md](../threat-hunting/queries/network.md).
+2. **Authorized?** Compare the source with the scanner inventory and change tickets.
+3. **Follow-on activity.** Look for successful sessions to the open ports after the scan, and for SOC-014 or SOC-015 alerts from the same source. The triage engine scores that progression higher.
+4. **Contain (real environment).** Isolate an unauthorized internal scanner and investigate the host that ran it.
+5. **Tune.** Exclude approved scanners by address with an owner and expiry. Keep the threshold.
+
+## SOC-014
+
+**LLMNR or NBT-NS poisoner answering many hosts — T1557.001**
+
+1. **Scope.** List the clients the source answered (`destination.ip`) and when.
+2. **Harvested credentials.** Search for NTLM authentications from those clients to the source. Each one is a hash the attacker may now crack or relay.
+3. **Benign checks.** Confirm the source is not a legacy WINS or print server.
+4. **Contain (real environment).** Isolate the source and reset passwords for accounts that authenticated to it.
+5. **Fix the root cause.** Disable LLMNR and NetBIOS over TCP/IP by Group Policy wherever possible.
+
+## SOC-015
+
+**Upload-heavy outbound session — T1041**
+
+1. **Scope.** Record the destination, port, bytes in each direction, and duration from the alert.
+2. **Ownership.** Identify the process on the source host that owned the connection, and the destination's owner and reputation.
+3. **Benign checks.** Backup and file-sync agents upload large volumes. Confirm against the approved destination list.
+4. **Contain (real environment).** Block the destination, preserve the flow records, and isolate the host if the transfer is not explained.
+5. **Tune.** Allow-list approved backup destinations by address with an owner and review date.
 
 ---
 *CyberPulse SOC Lab — by [Chandu Komme](https://github.com/ChanduKomme)*

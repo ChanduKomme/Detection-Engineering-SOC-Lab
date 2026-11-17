@@ -13,6 +13,9 @@ The palette matches the dark navy + cyan UI theme:
     violet #8B5CF6  Zeek DNS, SOC-003
     amber  #FFB020  Zeek notices, SOC-011
     red    #FF4D6D  Suricata, failures, SOC-010
+    sky    #38BDF8  SOC-013 vertical port scan
+    pink   #F472B6  SOC-014 LLMNR/NBT-NS poisoner
+    lime   #A3E635  SOC-015 upload-heavy exfiltration
 """
 
 __author__ = "Chandu Komme"
@@ -30,7 +33,8 @@ LOGS, ALERTS = "cyberpulse-logs", "cyberpulse-alerts"
 DATASET_COLORS = {"windows.security": "#00E5FF", "zeek.conn": "#14B8A6", "zeek.dns": "#8B5CF6",
                   "zeek.notice": "#FFB020", "suricata.eve": "#FF4D6D"}
 RULE_COLORS = {"SOC-002": "#00E5FF", "SOC-003": "#8B5CF6", "SOC-010": "#FF4D6D",
-               "SOC-011": "#FFB020", "SOC-012": "#14B8A6"}
+               "SOC-011": "#FFB020", "SOC-012": "#14B8A6", "SOC-013": "#38BDF8",
+               "SOC-014": "#F472B6", "SOC-015": "#A3E635"}
 
 
 def rule_names():
@@ -166,17 +170,17 @@ def build():
     ]
 
     layout = [  # id, type, x, y, w, h
-        ("cp-header", "visualization", 0, 0, 48, 8),
-        ("cp-kpi-events", "visualization", 0, 8, 12, 7),
-        ("cp-kpi-alerts", "visualization", 12, 8, 12, 7),
-        ("cp-kpi-sources", "visualization", 24, 8, 12, 7),
-        ("cp-kpi-rules", "visualization", 36, 8, 12, 7),
-        ("cp-alerts-donut", "visualization", 0, 15, 17, 17),
-        ("cp-telemetry-bar", "visualization", 17, 15, 31, 17),
-        ("cp-alerts-table", "visualization", 0, 32, 26, 15),
-        ("cp-failed-accounts", "visualization", 26, 32, 22, 15),
-        ("cp-search-alerts", "search", 0, 47, 48, 15),
-        ("cp-search-telemetry", "search", 0, 62, 48, 20),
+        ("cp-header", "visualization", 0, 0, 48, 9),
+        ("cp-kpi-events", "visualization", 0, 9, 12, 7),
+        ("cp-kpi-alerts", "visualization", 12, 9, 12, 7),
+        ("cp-kpi-sources", "visualization", 24, 9, 12, 7),
+        ("cp-kpi-rules", "visualization", 36, 9, 12, 7),
+        ("cp-alerts-donut", "visualization", 0, 16, 17, 17),
+        ("cp-telemetry-bar", "visualization", 17, 16, 31, 17),
+        ("cp-alerts-table", "visualization", 0, 33, 26, 15),
+        ("cp-failed-accounts", "visualization", 26, 33, 22, 15),
+        ("cp-search-alerts", "search", 0, 48, 48, 15),
+        ("cp-search-telemetry", "search", 0, 63, 48, 20),
     ]
     objects.append({
         "type": "dashboard", "id": DASHBOARD_ID,
