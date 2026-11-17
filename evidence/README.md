@@ -14,6 +14,20 @@ Proof that the lab works end to end, collected by **Chandu Komme** on 2026-11-17
 
 The full expected-versus-observed table is in [`live-run/alert-matrix.md`](live-run/alert-matrix.md).
 
+## Version 3.0 run on GitHub Actions
+
+[Run 44154476947](https://github.com/ChanduKomme/Detection-Engineering-SOC-Lab/actions/runs/44154476947) rebuilt the full lab on a clean server and verified the v3 detections:
+
+| Check | Result |
+|---|---|
+| Scenarios | 19 (7 Windows, 12 network): every one matched its expected alerts |
+| Events replayed | 114 (61 Windows, 53 Zeek/Suricata) |
+| Live rules | 8, including the new SOC-013 port scan, SOC-014 LLMNR poisoner, and SOC-015 exfiltration |
+| Alerts | 10 expected, 10 raised, 0 unexpected |
+| Triage | 9 incidents; top incident P1 with score 90 (upload-heavy exfiltration) |
+
+Output: [`ci-run/github-actions-v3-replay-9dde1794.txt`](ci-run/github-actions-v3-replay-9dde1794.txt) · Screenshot: [`screenshots/11-github-actions-v3-green.jpg`](screenshots/11-github-actions-v3-green.jpg)
+
 ## Contents
 
 | Folder | What it holds |

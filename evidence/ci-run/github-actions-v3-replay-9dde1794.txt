@@ -1,0 +1,29 @@
+# GitHub Actions run 44154476947 — v3.0.0 (commit c149884), fresh stack on ubuntu-24.04
+# https://github.com/ChanduKomme/Detection-Engineering-SOC-Lab/actions/runs/44154476947
+# Detection-as-code gates: passed in 22s. Live SIEM replay: passed in 2m 4s.
+$ python3 tools/replay.py --report reports/replay.json
+Replay 9dde1794-a453-4db1-9976-8e9daa27a974: 61 Windows events, 53 network records, 8 live rules.
+scenario                 events  alerts
+at-threshold                 10  SOC-002
+below-threshold               9  none
+mixed-outcomes               10  none
+split-sources                10  none
+password-spray                6  SOC-003
+spray-below-threshold         4  none
+spray-and-brute-force        12  SOC-002, SOC-003
+port-scan                     1  SOC-011
+benign-notice                 1  none
+dns-tunnel                    1  SOC-012
+dns-normal                    1  none
+ids-high-severity             1  SOC-010
+ids-low-severity              1  none
+port-scan-connections        25  SOC-013
+port-scan-below-threshold     15  none
+llmnr-poisoner                3  SOC-014
+llmnr-two-clients             2  none
+exfil-upload-heavy            1  SOC-015
+exfil-download                1  none
+$ python3 tools/case_report.py reports/replay.json -o reports/case.md
+Saved case file to reports/case.md
+$ python3 tools/triage.py reports/replay.json -o reports/incidents.md --json reports/incidents.json
+Triaged 9 incident(s); top: INC-009 P1 score 90. Saved to reports/incidents.md

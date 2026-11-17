@@ -267,7 +267,8 @@ All proof lives in the separate [`evidence/`](evidence/) folder, collected by Ch
 | Alerts | 7 per replay: 0 missing, 0 unexpected, 6 of 6 near misses silent |
 | Rule evaluation | All 5 live rules evaluating (77–82 runs each) |
 | Independent check | Counts confirmed with direct OpenSearch queries |
-| CI on a clean server | [GitHub Actions run](https://github.com/ChanduKomme/Detection-Engineering-SOC-Lab/actions/runs/44142204654): both jobs green, same 13-scenario result |
+| CI on a clean server (v3.0) | [GitHub Actions run](https://github.com/ChanduKomme/Detection-Engineering-SOC-Lab/actions/runs/44154476947): 19 of 19 scenarios, 8 live rules, 10 alerts, 9 triaged incidents |
+| CI on a clean server (v2) | [GitHub Actions run](https://github.com/ChanduKomme/Detection-Engineering-SOC-Lab/actions/runs/44142204654): both jobs green, same 13-scenario result |
 
 See the [evidence index](evidence/README.md) for all screenshots, the [alert matrix](evidence/live-run/alert-matrix.md), [results from OpenSearch](evidence/live-run/opensearch-results.json), and the [terminal output](evidence/terminal/).
 
