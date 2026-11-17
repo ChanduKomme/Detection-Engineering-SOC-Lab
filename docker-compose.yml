@@ -1,5 +1,5 @@
-# Author: Chandu Komme — Detection Engineering SOC Lab
-name: detection-engineering-soc-lab
+# Author: Chandu Komme — CyberPulse SOC Lab
+name: cyberpulse-soc-lab
 
 services:
   opensearch:
@@ -32,6 +32,10 @@ services:
       OPENSEARCH_SSL_VERIFICATIONMODE: none
     ports:
       - "127.0.0.1:${DASHBOARDS_PORT:-5601}:5601"
+    volumes:
+      # CyberPulse UI: theme, branding, login page and landing dashboard.
+      - ./config/dashboards/opensearch_dashboards.yml:/usr/share/opensearch-dashboards/config/opensearch_dashboards.yml:ro
+      - ./config/dashboards/branding:/usr/share/opensearch-dashboards/src/core/server/core_app/assets/cyberpulse:ro
     depends_on:
       opensearch:
         condition: service_healthy
