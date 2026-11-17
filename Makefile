@@ -4,7 +4,7 @@
 PYTHON ?= python3
 REPORT ?= reports/replay.json
 
-.PHONY: help install check lint test coverage pytest up replay replay-windows replay-network case health down clean coverage-update
+.PHONY: help install check lint test coverage pytest up replay replay-windows replay-network case triage health down clean coverage-update
 
 help:  ## Show available targets
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-16s %s\n", $$1, $$2}'
@@ -43,6 +43,9 @@ replay-network:  ## Replay Zeek and Suricata scenarios only
 
 case:  ## Build a Markdown incident case file from the last replay
 	$(PYTHON) tools/case_report.py $(REPORT) -o reports/case.md
+
+triage:  ## Group the last replay's alerts into scored incidents
+	$(PYTHON) tools/triage.py $(REPORT) -o reports/incidents.md --json reports/incidents.json
 
 health:  ## Show service and cluster health
 	./health-check.sh
