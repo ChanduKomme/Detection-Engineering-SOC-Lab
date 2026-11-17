@@ -1,5 +1,3 @@
-<p align="center"><img src="docs/assets/cyberpulse-banner.png" alt="CyberPulse SOC Lab" width="560"></p>
-
 # CyberPulse SOC Lab
 
 [![SOC Lab validation](https://github.com/ChanduKomme/Detection-Engineering-SOC-Lab/actions/workflows/soc-lab-ci.yml/badge.svg)](https://github.com/ChanduKomme/Detection-Engineering-SOC-Lab/actions/workflows/soc-lab-ci.yml)
@@ -9,8 +7,6 @@
 ![Detection tests](https://img.shields.io/badge/detection%20tests-52%20passing-brightgreen)
 
 **Built and maintained by [Chandu Komme](https://github.com/ChanduKomme).**
-
-![CyberPulse detection console](evidence/screenshots/02-detection-console-overview.jpg)
 
 A hands-on Security Operations Center lab with its own dark navy + cyan detection console. It treats detections as code. Rules are linted, unit-tested against positive and near-miss events, mapped to MITRE ATT&CK, and then proven end to end on a live SIEM pipeline that replays Windows, Zeek, and Suricata telemetry and checks every alert.
 
@@ -251,13 +247,7 @@ All proof lives in the separate [`evidence/`](evidence/) folder, collected by Ch
 | Independent check | Counts confirmed with direct OpenSearch queries |
 | CI on a clean server | [GitHub Actions run](https://github.com/ChanduKomme/Detection-Engineering-SOC-Lab/actions/runs/44142204654): both jobs green, same 13-scenario result |
 
-| | |
-|---|---|
-| ![Login](evidence/screenshots/01-cyberpulse-login.jpg) | ![Console](evidence/screenshots/02-detection-console-overview.jpg) |
-| ![SOC-012 alert](evidence/screenshots/04-soc012-alert-linked-to-dns-event.jpg) | ![Alert matrix](evidence/screenshots/03-alert-matrix-queue-and-telemetry.jpg) |
-| ![CI green](evidence/screenshots/08-github-actions-ci-green.jpg) | ![ATT&CK Navigator](evidence/screenshots/10-attack-navigator-right.jpg) |
-
-See the [evidence index](evidence/README.md), the [alert matrix](evidence/live-run/alert-matrix.md), [results from OpenSearch](evidence/live-run/opensearch-results.json), and the [terminal output](evidence/terminal/).
+See the [evidence index](evidence/README.md) for all screenshots, the [alert matrix](evidence/live-run/alert-matrix.md), [results from OpenSearch](evidence/live-run/opensearch-results.json), and the [terminal output](evidence/terminal/).
 
 ## Project structure
 
