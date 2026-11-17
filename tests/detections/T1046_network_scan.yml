@@ -1,11 +1,27 @@
 # Author: Chandu Komme
 rule: detection-rules/sigma/discovery/T1046_network_scan.yml
+target: Vertical Port Scan From One Source
 cases:
-  - name: Zeek port scan notice
+  - name: twenty-five closed ports probed in under a minute
     expect: match
     events:
-      - event: {note: 'Scan::Port_Scan', src: 192.0.2.20, dst: 198.51.100.30}
-  - name: unrelated Zeek notice
+      - repeat: 25
+        every: 2s
+        event: {proto: tcp, conn_state: REJ, id.orig_h: 192.0.2.20, id.resp_h: 198.51.100.30, id.resp_p: '10{i}'}
+  - name: nineteen ports stays below threshold
     expect: no_match
     events:
-      - event: {note: 'SSL::Invalid_Server_Cert', src: 192.0.2.20}
+      - repeat: 19
+        every: 2s
+        event: {proto: tcp, conn_state: S0, id.orig_h: 192.0.2.20, id.resp_h: 198.51.100.30, id.resp_p: '10{i}'}
+  - name: many established connections to one port
+    expect: no_match
+    events:
+      - repeat: 40
+        event: {proto: tcp, conn_state: SF, id.orig_h: 192.0.2.20, id.resp_h: 198.51.100.30, id.resp_p: 443}
+  - name: slow scan over several minutes
+    expect: no_match
+    events:
+      - repeat: 25
+        every: 10s
+        event: {proto: tcp, conn_state: REJ, id.orig_h: 192.0.2.20, id.resp_h: 198.51.100.30, id.resp_p: '10{i}'}

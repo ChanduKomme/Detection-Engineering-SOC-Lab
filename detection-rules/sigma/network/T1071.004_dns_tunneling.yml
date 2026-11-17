@@ -1,16 +1,31 @@
-title: Unusually Long Zeek DNS Query
-id: 353b7b79-9f07-50fe-b947-584402036b14
-status: experimental
-description: Flags long DNS names for review as a possible tunneling signal
-author: Chandu Komme (adapted from an MIT-licensed reference rule)
+title: DNS Query With an Encoded-Looking Long Label or Total Length
+id: 07cfc8a8-8a41-441f-8e49-4a908d944cf0
+status: test
+description: >-
+  DNS tunnels pack data into subdomain labels. This rule flags a Zeek DNS query
+  whose full name is 60 or more characters (the same threshold as live rule
+  SOC-012), a single label of 40 or more base32 or base64 characters, or a
+  TXT or NULL lookup of 40 or more characters.
+references:
+  - https://attack.mitre.org/techniques/T1071/004/
+author: Chandu Komme
+date: 2026/11/17
 tags: [attack.command_and_control, attack.t1071.004]
 logsource:
-  category: dns
   product: zeek
+  service: dns
 detection:
-  long_query:
-    query|re: '.{60,}'
-  condition: long_query
-level: medium
+  long_name:
+    query|re: '^.{60,}$'
+  long_label:
+    query|re: '(^|\.)[A-Za-z0-9+/=_-]{40,}\.'
+  data_record_lookup:
+    qtype_name:
+      - TXT
+      - 'NULL'
+    query|re: '^.{40,}$'
+  condition: long_name or long_label or data_record_lookup
+fields: [id.orig_h, query, qtype_name]
 falsepositives:
-  - Long names used by CDNs or telemetry services.
+  - Security and telemetry vendors that encode lookups in long DNS names.
+level: medium

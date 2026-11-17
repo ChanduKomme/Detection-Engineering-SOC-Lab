@@ -1,11 +1,27 @@
 # Author: Chandu Komme
 rule: detection-rules/sigma/network/T1071.004_dns_tunneling.yml
 cases:
-  - name: long encoded subdomain
+  - name: replay tunnel query (79 characters)
     expect: match
     events:
-      - event: {query: 'aGVsbG8td29ybGQtdGhpcy1pcy1hLXR1bm5lbGVkLXBheWxvYWQtY2h1bmstMDAx.t.example.test'}
+      - event: {query: 'aGVsbG8td29ybGQtdGhpcy1pcy1hLXR1bm5lbGVkLXBheWxvYWQtY2h1bmstMDAx.t.example.test', qtype_name: A}
+  - name: one long base32 label under sixty characters
+    expect: match
+    events:
+      - event: {query: 'nbswy3dpeb3w64tmmrqxi2lom5zgk3tdmvzwg5dfmq.x.test', qtype_name: A}
+  - name: TXT lookup of forty characters
+    expect: match
+    events:
+      - event: {query: 'c2-0042-beacon-checkin-host-ab.example.test', qtype_name: TXT}
   - name: ordinary hostname
     expect: no_match
     events:
-      - event: {query: 'www.example.test'}
+      - event: {query: 'www.example.test', qtype_name: A}
+  - name: CDN name with several medium labels
+    expect: no_match
+    events:
+      - event: {query: 'images-eu.cdn-assets.static.example.test', qtype_name: AAAA}
+  - name: short TXT lookup for SPF
+    expect: no_match
+    events:
+      - event: {query: '_spf.example.test', qtype_name: TXT}

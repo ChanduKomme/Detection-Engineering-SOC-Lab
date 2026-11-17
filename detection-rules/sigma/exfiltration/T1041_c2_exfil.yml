@@ -1,18 +1,30 @@
-title: Large Outbound Transfer in Zeek
-id: 931d7a6d-a49b-50dd-8670-e48f78786e09
-status: experimental
-description: Surfaces external connections with at least five million originator bytes
-author: Chandu Komme (adapted from an MIT-licensed reference rule)
+title: Large, Upload-Heavy Session From an Internal Host to the Internet
+id: 70286eaa-d2e0-479d-87b0-16e4155d3c28
+status: test
+description: >-
+  Exfiltration over an existing channel sends far more than it receives. This
+  rule needs an outbound Zeek connection that uploads at least 20 MB while
+  receiving under 1 MB, and lasts at least 30 seconds. Downloads, internal
+  transfers and quick bursts stay quiet.
+references:
+  - https://attack.mitre.org/techniques/T1041/
+author: Chandu Komme
+date: 2026/11/17
 tags: [attack.exfiltration, attack.t1041]
 logsource:
-  category: network_connection
   product: zeek
+  service: conn
 detection:
-  selection:
+  outbound:
     local_orig: true
     local_resp: false
-    orig_bytes|gte: 5000000
-  condition: selection
-level: medium
+  upload_heavy:
+    orig_bytes|gte: 20000000
+    resp_bytes|lte: 1000000
+  sustained:
+    duration|gte: 30
+  condition: outbound and upload_heavy and sustained
+fields: [id.orig_h, id.resp_h, id.resp_p, orig_bytes, resp_bytes, duration]
 falsepositives:
-  - Backups and approved large file transfers.
+  - Cloud backup and file-sync agents. Allow-list them by destination.
+level: medium

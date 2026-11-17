@@ -1,16 +1,67 @@
-title: Network Port Scan (Zeek detection)
-id: c4f86d2d-a9ef-5e6e-8b81-cc8a52ceb954
-status: experimental
-description: Matches a Zeek port-scan notice for analyst review
-author: Chandu Komme (adapted from an MIT-licensed reference rule)
+title: Zeek Scan Notice
+id: 7d17e24d-4d9f-4601-b07a-2e944fe3e6b4
+status: test
+description: >-
+  Zeek's scan detection raised a port-scan or address-scan notice. This is the
+  logic deployed live as SOC-011.
+references:
+  - https://attack.mitre.org/techniques/T1046/
+author: Chandu Komme
+date: 2026/11/17
 tags: [attack.discovery, attack.t1046]
 logsource:
-  category: network_connection
   product: zeek
+  service: notice
 detection:
-  selection:
-    note: 'Scan::Port_Scan'
-  condition: selection
-level: medium
+  scan_notice:
+    note:
+      - 'Scan::Port_Scan'
+      - 'Scan::Address_Scan'
+  condition: scan_notice
 falsepositives:
-  - Authorized vulnerability scanners and asset discovery.
+  - Authorized vulnerability scanners.
+level: medium
+---
+title: Failed Connection to a Probed Port
+name: probe_connection
+id: 5a6e7ae2-2846-4a06-96aa-89aaa8f7e3fc
+status: test
+description: A TCP attempt that was rejected or never answered, the signature of a probe.
+author: Chandu Komme
+date: 2026/11/17
+logsource:
+  product: zeek
+  service: conn
+detection:
+  probe:
+    proto: tcp
+    conn_state:
+      - REJ
+      - S0
+      - RSTOS0
+  condition: probe
+level: informational
+---
+title: Vertical Port Scan From One Source
+id: f6d097fd-7cee-4503-974e-5d5885a92d70
+status: test
+description: >-
+  Raw-connection fallback for sensors without the Zeek scan policy. One source
+  probing twenty or more distinct ports within a minute, where most attempts
+  fail, is a port scan even when no notice is raised.
+references:
+  - https://attack.mitre.org/techniques/T1046/
+author: Chandu Komme
+date: 2026/11/17
+correlation:
+  type: value_count
+  rules: [probe_connection]
+  group-by: [id.orig_h]
+  timespan: 1m
+  condition:
+    field: id.resp_p
+    gte: 20
+tags: [attack.discovery, attack.t1046]
+falsepositives:
+  - Authorized vulnerability scanners and network inventory tools.
+level: medium

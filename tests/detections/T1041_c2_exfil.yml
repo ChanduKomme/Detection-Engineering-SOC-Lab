@@ -1,15 +1,23 @@
 # Author: Chandu Komme
 rule: detection-rules/sigma/exfiltration/T1041_c2_exfil.yml
 cases:
-  - name: large outbound transfer from an internal host
+  - name: long upload-heavy session to the internet
     expect: match
     events:
-      - event: {local_orig: true, local_resp: false, orig_bytes: 25000000}
-  - name: small outbound transfer
+      - event: {local_orig: true, local_resp: false, orig_bytes: 48000000, resp_bytes: 52000, duration: 310.5}
+  - name: large download is not exfiltration
     expect: no_match
     events:
-      - event: {local_orig: true, local_resp: false, orig_bytes: 4096}
-  - name: large internal transfer
+      - event: {local_orig: true, local_resp: false, orig_bytes: 900000, resp_bytes: 48000000, duration: 310.5}
+  - name: balanced bulk transfer
     expect: no_match
     events:
-      - event: {local_orig: true, local_resp: true, orig_bytes: 25000000}
+      - event: {local_orig: true, local_resp: false, orig_bytes: 48000000, resp_bytes: 30000000, duration: 310.5}
+  - name: internal file copy
+    expect: no_match
+    events:
+      - event: {local_orig: true, local_resp: true, orig_bytes: 48000000, resp_bytes: 52000, duration: 310.5}
+  - name: short burst under thirty seconds
+    expect: no_match
+    events:
+      - event: {local_orig: true, local_resp: false, orig_bytes: 48000000, resp_bytes: 52000, duration: 4.2}
