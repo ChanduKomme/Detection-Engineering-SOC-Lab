@@ -249,11 +249,13 @@ All proof lives in the separate [`evidence/`](evidence/) folder, collected by Ch
 | Alerts | 7 per replay: 0 missing, 0 unexpected, 6 of 6 near misses silent |
 | Rule evaluation | All 5 live rules evaluating (77–82 runs each) |
 | Independent check | Counts confirmed with direct OpenSearch queries |
+| CI on a clean server | [GitHub Actions run](https://github.com/ChanduKomme/Detection-Engineering-SOC-Lab/actions/runs/44142204654): both jobs green, same 13-scenario result |
 
 | | |
 |---|---|
 | ![Login](evidence/screenshots/01-cyberpulse-login.jpg) | ![Console](evidence/screenshots/02-detection-console-overview.jpg) |
 | ![SOC-012 alert](evidence/screenshots/04-soc012-alert-linked-to-dns-event.jpg) | ![Alert matrix](evidence/screenshots/03-alert-matrix-queue-and-telemetry.jpg) |
+| ![CI green](evidence/screenshots/08-github-actions-ci-green.jpg) | ![ATT&CK Navigator](evidence/screenshots/10-attack-navigator-right.jpg) |
 
 See the [evidence index](evidence/README.md), the [alert matrix](evidence/live-run/alert-matrix.md), [results from OpenSearch](evidence/live-run/opensearch-results.json), and the [terminal output](evidence/terminal/).
 
