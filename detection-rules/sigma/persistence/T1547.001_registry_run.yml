@@ -1,19 +1,48 @@
-title: Persistence via Registry Run Keys
-id: 92e6c179-3652-523a-a67c-ebab32fcacc1
-status: experimental
-description: Detects malware writing to registry Run/RunOnce keys for persistence
-author: Chandu Komme (adapted from an MIT-licensed reference rule)
-tags: [attack.persistence, attack.t1547.001]
+title: Autorun Registry Value Pointing at a User-Writable Path or Script Host
+id: 897e9a08-d714-4456-b7a3-9d0b2f7baf22
+status: test
+description: >-
+  Watches the Run, RunOnce and policy Run keys plus Winlogon Userinit and Shell.
+  A new value only alerts when it launches something from a user-writable folder
+  or through a script host, which is how commodity malware persists. Signed
+  software updating its own autorun from Program Files stays quiet.
+references:
+  - https://attack.mitre.org/techniques/T1547/001/
+author: Chandu Komme
+date: 2026/11/17
+tags: [attack.persistence, attack.privilege_escalation, attack.t1547.001]
 logsource:
-  category: registry_set
   product: windows
+  category: registry_set
 detection:
-  selection:
+  autorun_key:
+    EventID: 13
     TargetObject|contains:
-      - '\SOFTWARE\Microsoft\Windows\CurrentVersion\Run'
-      - '\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce'
-      - '\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run'
-  condition: selection
-level: medium
+      - '\CurrentVersion\Run\'
+      - '\CurrentVersion\RunOnce\'
+      - '\CurrentVersion\RunOnceEx\'
+      - '\Policies\Explorer\Run\'
+      - '\Winlogon\Userinit'
+      - '\Winlogon\Shell'
+  writable_location:
+    Details|contains:
+      - '\AppData\'
+      - '\Temp\'
+      - '\Users\Public\'
+      - '\ProgramData\'
+      - '\Downloads\'
+  script_host:
+    Details|contains:
+      - 'powershell'
+      - 'mshta'
+      - 'wscript'
+      - 'cscript'
+      - 'rundll32'
+      - 'regsvr32'
+  known_updater:
+    Details|contains: '\AppData\Local\Microsoft\OneDrive\'
+  condition: autorun_key and (writable_location or script_host) and not known_updater
+fields: [TargetObject, Details, Image]
 falsepositives:
-  - Installers and approved startup applications.
+  - Per-user installers such as chat or meeting clients that run from AppData.
+level: high

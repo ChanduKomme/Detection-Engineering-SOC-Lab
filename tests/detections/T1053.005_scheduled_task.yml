@@ -1,15 +1,23 @@
 # Author: Chandu Komme
 rule: detection-rules/sigma/persistence/T1053.005_scheduled_task.yml
 cases:
-  - name: scheduled task launching PowerShell
+  - name: task runs PowerShell
     expect: match
     events:
-      - event: {EventID: 4698, TaskName: '\Updater', TaskContent: '<Exec><Command>powershell.exe</Command><Arguments>-w hidden -c iex</Arguments></Exec>'}
-  - name: scheduled task running an approved binary
+      - event: {EventID: 4698, TaskName: '\Updater', TaskContent: '<Exec><Command>powershell.exe</Command><Arguments>-w hidden -nop -c iex</Arguments></Exec>'}
+  - name: task runs a binary from AppData
+    expect: match
+    events:
+      - event: {EventID: 4698, TaskName: '\Sync', TaskContent: '<Exec><Command>C:\Users\bob\AppData\Local\sync.exe</Command></Exec>'}
+  - name: hidden task running a Program Files binary
+    expect: match
+    events:
+      - event: {EventID: 4698, TaskName: '\Helper', TaskContent: '<Settings><Hidden>true</Hidden></Settings><Exec><Command>C:\Program Files\Helper\h.exe</Command></Exec>'}
+  - name: visible task for an installed product
     expect: no_match
     events:
-      - event: {EventID: 4698, TaskName: '\Backup', TaskContent: '<Exec><Command>C:\Program Files\Backup\agent.exe</Command></Exec>'}
+      - event: {EventID: 4698, TaskName: '\Backup', TaskContent: '<Settings><Hidden>false</Hidden></Settings><Exec><Command>C:\Program Files\Backup\agent.exe</Command></Exec>'}
   - name: task deleted rather than created
     expect: no_match
     events:
-      - event: {EventID: 4699, TaskContent: '<Exec><Command>powershell.exe</Command></Exec>'}
+      - event: {EventID: 4699, TaskName: '\Updater', TaskContent: '<Exec><Command>powershell.exe</Command></Exec>'}

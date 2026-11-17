@@ -1,11 +1,27 @@
 # Author: Chandu Komme
 rule: detection-rules/sigma/persistence/T1547.001_registry_run.yml
 cases:
-  - name: value written under the Run key
+  - name: Run key launching a binary from AppData
     expect: match
     events:
-      - event: {TargetObject: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\updater', Details: 'C:\Users\Public\u.exe'}
-  - name: unrelated registry write
+      - event: {EventID: 13, TargetObject: 'HKU\S-1-5-21-1\Software\Microsoft\Windows\CurrentVersion\Run\updater', Details: 'C:\Users\bob\AppData\Roaming\upd\upd.exe'}
+  - name: RunOnce launching mshta
+    expect: match
+    events:
+      - event: {EventID: 13, TargetObject: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce\x', Details: 'mshta.exe vbscript:Execute("...")'}
+  - name: Winlogon Userinit hijack to a public folder
+    expect: match
+    events:
+      - event: {EventID: 13, TargetObject: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\Userinit', Details: 'C:\Windows\system32\userinit.exe,C:\Users\Public\p.exe'}
+  - name: signed software under Program Files
     expect: no_match
     events:
-      - event: {TargetObject: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\Hidden'}
+      - event: {EventID: 13, TargetObject: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\SecurityHealth', Details: 'C:\Program Files\Windows Defender\MSASCuiL.exe'}
+  - name: OneDrive updating its own autorun
+    expect: no_match
+    events:
+      - event: {EventID: 13, TargetObject: 'HKU\S-1-5-21-1\Software\Microsoft\Windows\CurrentVersion\Run\OneDrive', Details: '"C:\Users\bob\AppData\Local\Microsoft\OneDrive\OneDrive.exe" /background'}
+  - name: AppData path written to a non-autorun key
+    expect: no_match
+    events:
+      - event: {EventID: 13, TargetObject: 'HKU\S-1-5-21-1\Software\Vendor\Settings\Path', Details: 'C:\Users\bob\AppData\Roaming\vendor'}

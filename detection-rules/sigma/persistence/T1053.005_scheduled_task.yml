@@ -1,24 +1,42 @@
-title: Script-Related Scheduled Task Creation
-id: 087806d6-97c0-509b-93b2-019965851dbc
-status: experimental
-description: Detects creation of suspicious scheduled tasks for persistence
-author: Chandu Komme (adapted from an MIT-licensed reference rule)
-tags: [attack.persistence, attack.t1053.005]
+title: Scheduled Task Created to Run a LOLBin, Hidden Task or User-Path Payload
+id: 93e47aea-1ddd-40d6-ae94-ce27ff520a43
+status: test
+description: >-
+  Reads the task XML from event 4698. It alerts when the action starts a
+  living-off-the-land binary, runs from a user-writable folder, or the task is
+  marked hidden. Each of these is rare for legitimate software and common for
+  persistence.
+references:
+  - https://attack.mitre.org/techniques/T1053/005/
+author: Chandu Komme
+date: 2026/11/17
+tags: [attack.execution, attack.persistence, attack.t1053.005]
 logsource:
   product: windows
   service: security
 detection:
-  selection:
+  task_created:
     EventID: 4698
-  keywords:
+  lolbin_action:
     TaskContent|contains:
       - 'powershell'
-      - 'wscript'
-      - 'cscript'
+      - 'pwsh'
       - 'mshta'
       - 'rundll32'
       - 'regsvr32'
-  condition: selection and keywords
-level: high
+      - 'certutil'
+      - 'bitsadmin'
+      - 'wscript'
+      - 'cscript'
+  user_path_action:
+    TaskContent|contains:
+      - '\AppData\'
+      - '\Users\Public\'
+      - '\Temp\'
+  hidden_task:
+    TaskContent|contains: '<Hidden>true</Hidden>'
+  condition: task_created and (lolbin_action or user_path_action or hidden_task)
+fields: [TaskName, SubjectUserName, TaskContent]
 falsepositives:
-  - Scheduled administrative scripts and application updates.
+  - Administrative maintenance scripts scheduled through PowerShell.
+level: high
