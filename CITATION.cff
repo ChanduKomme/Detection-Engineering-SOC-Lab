@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use or reference this lab, please cite it as below."
+title: "Detection Engineering SOC Lab"
+authors:
+  - family-names: "Komme"
+    given-names: "Chandu"
+repository-code: "https://github.com/ChanduKomme/Detection-Engineering-SOC-Lab"
+license: MIT
+version: "2.0.0"
+date-released: 2026-11-17

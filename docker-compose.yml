@@ -1,0 +1,70 @@
+# Author: Chandu Komme — Detection Engineering SOC Lab
+name: detection-engineering-soc-lab
+
+services:
+  opensearch:
+    image: opensearchproject/opensearch:2.19.5
+    environment:
+      discovery.type: single-node
+      node.store.allow_mmap: "false"
+      OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"
+      OPENSEARCH_INITIAL_ADMIN_PASSWORD: "${OPENSEARCH_INITIAL_ADMIN_PASSWORD:?Run ./setup.sh to generate .env}"
+    ports:
+      - "127.0.0.1:${OPENSEARCH_PORT:-9200}:9200"
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          curl --fail --silent --insecure
+          --user "admin:$$OPENSEARCH_INITIAL_ADMIN_PASSWORD"
+          'https://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=3s' >/dev/null
+      interval: 5s
+      timeout: 5s
+      retries: 40
+      start_period: 15s
+
+  dashboards:
+    image: opensearchproject/opensearch-dashboards:2.19.5
+    environment:
+      OPENSEARCH_HOSTS: '["https://opensearch:9200"]'
+      OPENSEARCH_SSL_VERIFICATIONMODE: none
+    ports:
+      - "127.0.0.1:${DASHBOARDS_PORT:-5601}:5601"
+    depends_on:
+      opensearch:
+        condition: service_healthy
+
+  vector:
+    image: timberio/vector:0.61.0-debian
+    command: ["--config", "/etc/vector/vector.toml", "--require-healthy", "true"]
+    environment:
+      VECTOR_DANGEROUSLY_ALLOW_ENV_VAR_INTERPOLATION: "true"
+      OPENSEARCH_INITIAL_ADMIN_PASSWORD: "${OPENSEARCH_INITIAL_ADMIN_PASSWORD:?Run ./setup.sh to generate .env}"
+    ports:
+      - "127.0.0.1:${VECTOR_PORT:-8688}:8688"
+    volumes:
+      - ./config/vector/vector.toml:/etc/vector/vector.toml:ro
+      - ./telemetry:/var/log/soc:ro
+      - vector-data:/var/lib/vector
+    depends_on:
+      opensearch:
+        condition: service_healthy
+
+  elastalert2:
+    image: jertel/elastalert2:2.32.0
+    command: ["--verbose"]
+    environment:
+      ES_USERNAME: admin
+      ES_PASSWORD: "${OPENSEARCH_INITIAL_ADMIN_PASSWORD:?Run ./setup.sh to generate .env}"
+    volumes:
+      - ./config/elastalert2/config.yml:/opt/elastalert/config.yaml:ro
+      - ./config/elastalert2/rules:/opt/elastalert/rules:ro
+    depends_on:
+      opensearch:
+        condition: service_healthy
+
+volumes:
+  opensearch-data:
+  vector-data:
