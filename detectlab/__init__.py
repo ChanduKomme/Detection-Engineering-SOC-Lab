@@ -8,4 +8,4 @@ detection be tested in CI without starting the Docker stack.
 """
 
 __author__ = "Chandu Komme"
-__version__ = "2.2.0"
+__version__ = "3.0.0"

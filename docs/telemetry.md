@@ -43,7 +43,7 @@ cp fixtures/network/suricata/eve.json telemetry/suricata/
 
 | Dataset | Useful fields |
 |---|---|
-| `zeek.conn` | Source and destination IP, `destination.port`, `source.bytes` (originator bytes), and transport |
+| `zeek.conn` | Source and destination IP and port, `source.bytes` and `destination.bytes`, transport, `zeek.conn_state`, `zeek.duration`, and `network.direction` from `local_orig`/`local_resp` (used by SOC-013, SOC-014, and SOC-015) |
 | `zeek.dns` | Source IP, `dns.question.name`, and `dns.question.length` (used by SOC-012) |
 | `zeek.notice` | Source IP and notice name in `rule.name` (used by SOC-011) |
 | `suricata.eve` | EVE event type in `event.category`, endpoint IPs, `destination.port`, and signature name, ID, and severity (used by SOC-010) |
@@ -64,6 +64,12 @@ Use the original Zeek timestamps and Suricata event times when investigating. Be
 | `dns-normal` | `zeek/dns.log` | none |
 | `ids-high-severity` | `suricata/eve.json` | SOC-010 |
 | `ids-low-severity` | `suricata/eve.json` | none |
+| `port-scan-connections` | `zeek/conn.log` (25 records) | SOC-013 |
+| `port-scan-below-threshold` | `zeek/conn.log` (15 records) | none |
+| `llmnr-poisoner` | `zeek/conn.log` (3 records) | SOC-014 |
+| `llmnr-two-clients` | `zeek/conn.log` (2 records) | none |
+| `exfil-upload-heavy` | `zeek/conn.log` | SOC-015 |
+| `exfil-download` | `zeek/conn.log` | none |
 
 ---
 *CyberPulse SOC Lab — by [Chandu Komme](https://github.com/ChanduKomme)*

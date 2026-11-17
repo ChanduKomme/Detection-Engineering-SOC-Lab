@@ -2,6 +2,22 @@
 
 All notable changes to the CyberPulse SOC Lab by Chandu Komme.
 
+## 3.0.0 — 2026-11-17
+
+### Added
+- **Three new live detections** backed by the rewritten Sigma rules:
+  - SOC-013: vertical port scan (cardinality of refused or unanswered ports per source)
+  - SOC-014: LLMNR/NBT-NS poisoner (cardinality of answered clients per responder)
+  - SOC-015: upload-heavy outbound exfiltration
+- **Automated triage engine** (`tools/triage.py`, `make triage`). It groups alerts per source into incidents, scores severity, corroboration and kill-chain progress, and assigns P1/P2/P3 with response actions. CI runs it on every replay.
+- **Multi-record network replay.** Scenarios can repeat records with templated ports and hosts. Six new scenarios cover the new rules and their near misses, for 19 scenarios and 114 events in total.
+- Playbooks, case-report context and dashboard colors for SOC-013 to SOC-015.
+
+### Changed
+- Vector now normalizes the Zeek source port, response bytes, connection state, duration and network direction, and the index template maps them.
+- Replay reports record each alert's source address and alert time.
+- The Python test suite grew to 152 tests.
+
 ## 2.2.0 — 2026-11-17
 
 ### Changed

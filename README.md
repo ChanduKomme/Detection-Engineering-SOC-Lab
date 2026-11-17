@@ -3,7 +3,7 @@
 [![SOC Lab validation](https://github.com/ChanduKomme/Detection-Engineering-SOC-Lab/actions/workflows/soc-lab-ci.yml/badge.svg)](https://github.com/ChanduKomme/Detection-Engineering-SOC-Lab/actions/workflows/soc-lab-ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![MITRE ATT&CK](https://img.shields.io/badge/MITRE-ATT%26CK-red)](docs/attack-coverage.md)
-![Version](https://img.shields.io/badge/version-2.2.0-00E5FF)
+![Version](https://img.shields.io/badge/version-3.0.0-00E5FF)
 ![Detection tests](https://img.shields.io/badge/detection%20tests-87%20passing-brightgreen)
 
 **Built and maintained by [Chandu Komme](https://github.com/ChanduKomme).**
@@ -21,11 +21,12 @@ A hands-on Security Operations Center lab with its own dark navy + cyan detectio
 
 | | |
 |---|---|
-| Live rules verified by replay | **5** (SOC-002, SOC-003, SOC-010, SOC-011, SOC-012) |
+| Live rules verified by replay | **8** (SOC-002, SOC-003, SOC-010 to SOC-015) |
 | Sigma rules with unit tests | **16 files**, 87 positive and negative cases |
 | ATT&CK techniques covered | **17** across 11 tactics — see [coverage](docs/attack-coverage.md) |
-| Replay scenarios | **13** (7 Windows, 6 network), each with an expected alert per rule |
-| Python test suite | **142 tests** for the evaluator, catalog, replay harness, case reports, and dashboard |
+| Replay scenarios | **19** (7 Windows, 12 network) with 114 events, each with an expected alert per rule |
+| Python test suite | **152 tests** for the evaluator, catalog, replay harness, triage engine, case reports, and dashboard |
+| Automated triage | Alerts grouped into scored **P1/P2/P3 incidents** per attacking source |
 | Detection console | **11 panels**: KPIs, alerts by rule, telemetry by scenario, failed logons by account, alert queue |
 
 ## Contents
@@ -52,10 +53,20 @@ The lab follows the analyst workflow from a raw event to a supported investigati
 
 1. Write a Sigma rule and its unit tests, then pass the offline lint, test, and coverage gates.
 2. Replay Windows Security events and fresh Zeek and Suricata records.
-3. Normalize event time, addresses, accounts, DNS length, and signature metadata in Vector.
-4. Let ElastAlert2 evaluate five live rules and write alerts back to OpenSearch.
+3. Normalize event time, addresses, ports, accounts, byte counts, connection state, direction, DNS length, and signature metadata in Vector.
+4. Let ElastAlert2 evaluate eight live rules and write alerts back to OpenSearch.
 5. Verify the full alert matrix: every expected alert present, no unexpected alert anywhere.
-6. Generate an incident case file, follow the playbook, and record a disposition.
+6. Triage the alerts into scored incidents, generate the case file, follow the playbook, and record a disposition.
+
+### What's new in version 3
+
+| Area | Implemented by Chandu Komme |
+|---|---|
+| Live detections | SOC-013 vertical port scan (cardinality), SOC-014 LLMNR/NBT-NS poisoner (cardinality), and SOC-015 upload-heavy exfiltration, each backed by a rewritten Sigma rule |
+| Collection | Zeek source port, response bytes, connection state, duration, and network direction normalized in Vector and mapped in OpenSearch |
+| Replay | Multi-record network scenarios (a 25-port scan, a poisoner answering three hosts, an exfiltration session) with near misses for each |
+| Automated triage | `tools/triage.py` groups alerts per source into incidents, scores severity, corroboration, and kill-chain progress, and assigns P1/P2/P3 with response actions |
+| Rules | All 12 reference Sigma rules rewritten with stronger logic; 87 detection test cases |
 
 ### What I built in version 2
 
@@ -113,6 +124,9 @@ flowchart TD
 | SOC-010 | T1071.001 Web Protocols | any | Suricata alert with priority 1 or 2 | [triage](docs/playbooks.md#soc-010) |
 | SOC-011 | T1046 Network Service Discovery | any | Zeek `Scan::Port_Scan` notice | [triage](docs/playbooks.md#soc-011) |
 | SOC-012 | T1071.004 DNS | any | Zeek DNS query name of 60+ characters | [triage](docs/playbooks.md#soc-012) |
+| SOC-013 | T1046 Network Service Discovery | cardinality | 20+ distinct refused or unanswered TCP ports from one source in 1 minute | [triage](docs/playbooks.md#soc-013) |
+| SOC-014 | T1557.001 LLMNR/NBT-NS Poisoning | cardinality | One host answering LLMNR or NBT-NS for 3+ clients in 10 minutes | [triage](docs/playbooks.md#soc-014) |
+| SOC-015 | T1041 Exfiltration Over C2 Channel | any | Outbound session uploading 20 MB+ while receiving under 1 MB, lasting 30 s+ | [triage](docs/playbooks.md#soc-015) |
 
 SOC-002 and SOC-003 look at the same failures from two angles: many attempts against one account versus a few attempts across many accounts. The `spray-and-brute-force` replay scenario triggers both for one source.
 
@@ -124,14 +138,15 @@ SOC-002 and SOC-003 look at the same failures from two angles: many attempts aga
 | Password spraying | T1110.003 | Live rule SOC-003 with replay |
 | Successful logon after a failure burst | T1078 | Chained Sigma correlation with tests |
 | High-severity IDS alert | T1071.001 | Live rule SOC-010 with replay |
-| Port-scan notices | T1046 | Live rule SOC-011 with replay |
+| Port scans (Zeek notice and raw connections) | T1046 | Live rules SOC-011 and SOC-013 with replay |
 | Long DNS names | T1071.004 | Live rule SOC-012 with replay |
-| LSASS access and LLMNR/NBT-NS traffic | T1003.001, T1557.001 | Tested Sigma references |
+| LLMNR/NBT-NS poisoning | T1557.001 | Live rule SOC-014 with replay |
+| LSASS memory access | T1003.001 | Tested Sigma reference |
 | Encoded PowerShell and WMIC remote execution | T1059.001, T1027, T1047 | Tested Sigma references |
 | Scheduled tasks and registry Run keys | T1053.005, T1547.001 | Tested Sigma references |
 | SMB connections and pass-the-hash logons | T1021.002, T1550.002 | Tested Sigma references |
-| Large outbound transfers | T1041 | Tested Sigma reference |
-| Defender real-time protection disabled | T1562.001 | Tested Sigma reference |
+| Upload-heavy exfiltration | T1041 | Live rule SOC-015 with replay |
+| Defender disabled or exclusions added | T1562.001 | Tested Sigma reference |
 
 The generated [ATT&CK coverage table](docs/attack-coverage.md) lists the rules and test counts per technique. Load [`attack-navigator-layer.json`](detection-rules/attack-navigator-layer.json) in the [ATT&CK Navigator](https://mitre-attack.github.io/attack-navigator/) for a heat map. See the [Sigma rule notes](detection-rules/README.md) for deployment status and false-positive guidance.
 
@@ -229,10 +244,17 @@ To customize the host ports, add the relevant values from [`.env.example`](.env.
 | `port-scan` / `benign-notice` | Zeek notices | SOC-011 / none |
 | `dns-tunnel` / `dns-normal` | 79- and 16-character DNS names | SOC-012 / none |
 | `ids-high-severity` / `ids-low-severity` | Suricata alerts with priority 1 and 3 | SOC-010 / none |
+| `port-scan-connections` / `port-scan-below-threshold` | 25 and 15 refused ports from one source | SOC-013 / none |
+| `llmnr-poisoner` / `llmnr-two-clients` | LLMNR answers to 3 and 2 clients | SOC-014 / none |
+| `exfil-upload-heavy` / `exfil-download` | 48 MB up vs 48 MB down over 5 minutes | SOC-015 / none |
 
-The JSON report contains the replay ID, event IDs, alert IDs, the expected matrix, and the evaluation time of each rule. Use it with [OpenSearch Dashboards](dashboards/README.md) to capture your own evidence.
+The JSON report contains the replay ID, event IDs, alert IDs with their source addresses, the expected matrix, and the evaluation time of each rule.
 
-[GitHub Actions](https://github.com/ChanduKomme/Detection-Engineering-SOC-Lab/actions/workflows/soc-lab-ci.yml) runs in two stages. The first runs the detection-as-code gates and the pytest suite. The second validates the Vector configuration, starts a fresh Compose stack, runs the full replay, builds the case file, and publishes both as the `replay-evidence` artifact.
+### Automated triage
+
+`python3 tools/triage.py reports/replay.json -o reports/incidents.md` (or `make triage`) turns the alerts into a prioritized queue. Alerts from the same source become one incident. Its score is the highest rule severity, plus 8 for each extra rule that corroborates it, plus 10 for each extra ATT&CK tactic, which captures kill-chain progress. Scores of 85 or more are P1, 65 or more are P2, and the rest P3. Each incident lists its evidence IDs and response actions for its tactics. Use it with [OpenSearch Dashboards](dashboards/README.md) to capture your own evidence.
+
+[GitHub Actions](https://github.com/ChanduKomme/Detection-Engineering-SOC-Lab/actions/workflows/soc-lab-ci.yml) runs in two stages. The first runs the detection-as-code gates and the pytest suite. The second validates the Vector configuration, starts a fresh Compose stack, runs the full replay, builds the case file, triages the alerts into incidents, and publishes all of it as the `replay-evidence` artifact.
 
 ## Local run evidence
 
@@ -255,7 +277,7 @@ See the [evidence index](evidence/README.md) for all screenshots, the [alert mat
 |---|---|
 | [`docker-compose.yml`](docker-compose.yml) and [`setup.sh`](setup.sh) | Local services and first-run initialization |
 | [`config/vector/`](config/vector/) | Collector inputs and normalization |
-| [`config/elastalert2/`](config/elastalert2/) | Alert engine and the five live rules |
+| [`config/elastalert2/`](config/elastalert2/) | Alert engine and the eight live rules |
 | [`config/opensearch/`](config/opensearch/) | Index template with explicit field mappings |
 | [`config/dashboards/`](config/dashboards/) | CyberPulse console theme, branding assets, and login page |
 | [`dashboards/`](dashboards/) | Detection console saved objects and dashboard guide |
@@ -274,7 +296,7 @@ Run the stack on a trusted local machine with synthetic or sanitized data. Host 
 
 ## Author
 
-**Chandu Komme** — designed, built, and validated this lab: the CyberPulse detection console and theme, the Compose deployment, Vector normalization pipeline, five live ElastAlert2 detections, the `detectlab` detection-as-code toolkit with its Sigma evaluator, linter, and ATT&CK coverage generator, the 87 detection unit tests and pytest suite, the Windows and network replay harness and CI pipeline, the incident case-file generator, the triage playbooks and hunting queries, the investigation worksheet, and the AI triage exercise.
+**Chandu Komme** — designed, built, and validated this lab: the CyberPulse detection console and theme, the Compose deployment, Vector normalization pipeline, eight live ElastAlert2 detections, the automated triage engine, the `detectlab` detection-as-code toolkit with its Sigma evaluator, linter, and ATT&CK coverage generator, the 87 detection unit tests and pytest suite, the Windows and network replay harness and CI pipeline, the incident case-file generator, the triage playbooks and hunting queries, the investigation worksheet, and the AI triage exercise.
 
 - GitHub: [ChanduKomme](https://github.com/ChanduKomme)
 
